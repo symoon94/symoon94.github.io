@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack:///./src/pages/index.js"],"names":[],"mappings":"2FAAA,gCAEe,4BACb,6BACE","file":"component---src-pages-index-js-be45d908455609342529.js","sourcesContent":["import React from \"react\"\n\nexport default () => (\n  <div>\n    <h1>Sooyoung Moon's Website</h1>\n  </div>\n)\n"],"sourceRoot":""}

@@ -871,6 +871,63 @@
     }
 
     /* ========================================
+       Currently Into Section
+       ======================================== */
+    .into-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .into-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .into-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+
+    .into-card-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    .into-card-value {
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .into-card-value small {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      margin-top: 0.3rem;
+    }
+
+    .into-card-value a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .into-card-value a:hover {
+      border-bottom-color: var(--accent);
+    }
+
+    /* ========================================
        Noise texture overlay
        ======================================== */
     .noise {
@@ -1039,6 +1096,45 @@
             <span class="ko">가족 &bull; 맛집 발굴 &bull; 춤 &bull; 귀여운 것 &bull; 자동화</span>
             <span class="en">Family &bull; Food spots &bull; Dancing &bull; Cute things &bull; Automation</span>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Currently Into Section -->
+  <section class="section" id="into" style="padding-top:3rem;padding-bottom:3rem;">
+    <div class="reveal">
+      <div class="section-label">
+        <span class="ko">요즘 빠진 것들</span>
+        <span class="en">Currently Into</span>
+      </div>
+    </div>
+    <div class="into-grid">
+      <div class="into-card reveal reveal-delay-1">
+        <div class="into-card-label">
+          <span class="ko">TV 시리즈</span><span class="en">TV Series</span>
+        </div>
+        <div class="into-card-value">
+          <a href="https://www.imdb.com/title/tt11280740/" target="_blank" rel="noopener noreferrer">Severance</a>
+          <small>Apple TV+ (2022&ndash;)</small>
+        </div>
+      </div>
+      <div class="into-card reveal reveal-delay-2">
+        <div class="into-card-label">
+          <span class="ko">음악</span><span class="en">Music</span>
+        </div>
+        <div class="into-card-value">
+          <span class="ko">업데이트 예정</span>
+          <span class="en">Coming soon</span>
+        </div>
+      </div>
+      <div class="into-card reveal reveal-delay-3">
+        <div class="into-card-label">
+          <span class="ko">읽는 중</span><span class="en">Reading</span>
+        </div>
+        <div class="into-card-value">
+          <span class="ko">업데이트 예정</span>
+          <span class="en">Coming soon</span>
         </div>
       </div>
     </div>

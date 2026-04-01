@@ -857,29 +857,33 @@
     .typo-section {
       position: relative;
       width: 100%;
-      padding: 4rem 0 2rem;
+      padding: 3rem 0;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
       background: var(--bg-primary);
       overflow: hidden;
+      user-select: none;
     }
 
-    #typoCanvas {
-      display: block;
-      max-width: 100%;
-      height: auto;
-    }
-
-    .typo-caption {
+    .typo-grid {
       font-family: var(--font-mono);
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-top: 1.5rem;
+      line-height: 1.15;
+      white-space: pre;
       text-align: center;
+      overflow: hidden;
+      cursor: default;
     }
+
+    .typo-grid span {
+      display: inline;
+      transition: opacity 0.3s ease;
+    }
+
+    /* pretext-style weight classes */
+    .tw3 { font-weight: 300; }
+    .tw5 { font-weight: 500; }
+    .tw7 { font-weight: 700; }
+    .tit { font-style: italic; }
 
     /* ========================================
        Noise texture overlay
@@ -966,7 +970,7 @@
 
   <!-- Typographic Philosophy Section -->
   <section class="typo-section" id="philosophy">
-    <canvas id="typoCanvas"></canvas>
+    <div id="typoGrid" class="typo-grid"></div>
   </section>
 
   <!-- ASCII Divider -->
@@ -1775,15 +1779,14 @@
     })();
 
     // ========================================
-    // Typographic Philosophy Canvas
-    // Text flows naturally, LUNA acts as mask
+    // Pretext-style Typographic LUNA
+    // Each character chosen by brightness to form LUNA shape
+    // Inspired by chenglou/pretext ASCII demo
     // ========================================
     (function() {
-      var canvas = document.getElementById('typoCanvas');
-      if (!canvas) return;
-      var ctx = canvas.getContext('2d');
+      var grid = document.getElementById('typoGrid');
+      if (!grid) return;
 
-      // Each phrase appears only once — no duplicates
       var phrases = [
         'Hack the world!',
         '규칙적인 삶',
@@ -1802,7 +1805,6 @@
         '그럼에도 불구하고',
         'Push the limit.',
         '본질 & 왜',
-        '숲:나무=8:2',
         '미친 실행력',
         '약속을 지킨다',
         '가족 > 업무 > 나',
@@ -1810,134 +1812,110 @@
         '레버리지',
         'NPC 마인드 버리기',
         '위험한 선택을 한다',
-        '2분 안에 할 수 있는 것은 바로 액션',
+        '2분 안에 액션',
         'COO처럼 일한다',
         '테크 인플루언서',
-        '패턴을 깨려고 하는 것',
+        '패턴을 깨는 것',
         '높은 자존감',
         '철학을 가진다',
         '럭키비키 마인드',
-        '실수를 지금 해야 나중에 덜 한다',
         'Find a cheat code for life.',
         '자동사냥을 돌린다',
-        '남들처럼 하면 절대 크게 성공 못한다',
-        '창의적으로 문제를 해결하는 것',
+        '창의적 문제 해결',
         '물음표를 가지는 것',
         'Radical candor.',
-        '컨디션 조절을 잘 하자',
-        '하나만 집중하고 숨쉬듯 자연스러워지면 다음 것',
+        '컨디션 조절',
         '끊임없는 호기심',
         '문제 해결 덕질',
+        '숲:나무=8:2',
       ];
 
+      // Build a continuous character stream from phrases (no repeats within one pass)
+      var allChars = phrases.join(' · ');
+      // Extend to ensure enough characters
+      var charStream = allChars;
+      while (charStream.length < 6000) charStream += ' · ' + allChars;
+
       function render() {
-        var dpr = Math.min(window.devicePixelRatio || 1, 2);
-        var w = Math.min(window.innerWidth, 1200);
-        var h = Math.round(w * 0.35);
-
-        canvas.width = w * dpr;
-        canvas.height = h * dpr;
-        canvas.style.width = w + 'px';
-        canvas.style.height = h + 'px';
-        ctx.scale(dpr, dpr);
-        ctx.clearRect(0, 0, w, h);
-
+        var w = Math.min(window.innerWidth, 1100);
         var mobile = w < 600;
-        var lineH = mobile ? 8 : 11;
-        var baseSize = mobile ? 6 : 8;
-        var gap = '  ·  ';
+        var fontSize = mobile ? 9 : 13;
+        var cols = Math.floor(w / (fontSize * 0.62));
+        var rows = Math.floor((w * 0.3) / (fontSize * 1.15));
+        if (mobile) rows = Math.floor((w * 0.38) / (fontSize * 1.15));
 
-        // Step 1: Build the full text canvas (text flows naturally, no overlap)
-        var textCanvas = document.createElement('canvas');
-        textCanvas.width = w;
-        textCanvas.height = h;
-        var tCtx = textCanvas.getContext('2d');
-        tCtx.clearRect(0, 0, w, h);
+        // Step 1: Render LUNA to offscreen canvas to get brightness map
+        var mc = document.createElement('canvas');
+        mc.width = cols;
+        mc.height = rows;
+        var mCtx = mc.getContext('2d');
+        mCtx.fillStyle = '#000';
+        mCtx.fillRect(0, 0, cols, rows);
+        mCtx.fillStyle = '#fff';
+        mCtx.textAlign = 'center';
+        mCtx.textBaseline = 'middle';
+        // Render LUNA large enough to fill the grid
+        var lunaFontSize = Math.round(rows * 0.85);
+        mCtx.font = '900 ' + lunaFontSize + 'px Inter, Helvetica, sans-serif';
+        mCtx.fillText('LUNA', cols / 2, rows / 2);
+        var maskData = mCtx.getImageData(0, 0, cols, rows).data;
 
+        // Step 2: Build HTML grid — each character gets brightness-based styling
+        // Pretext approach: brightness determines font-weight + opacity + color
+        var html = '';
+        var ci = 0;
         var colors = [
           [167,139,250], // lavender
           [196,181,253], // light lavender
           [139,92,246],  // violet
           [245,208,100], // warm yellow
           [253,224,137], // soft yellow
-          [200,160,255], // pastel purple
         ];
 
-        // Concatenate all phrases into a continuous string with separators
-        var fullText = phrases.join(gap);
-        // Repeat enough to fill the canvas
-        while (fullText.length < 8000) {
-          fullText += gap + phrases.join(gap);
+        for (var row = 0; row < rows; row++) {
+          for (var col = 0; col < cols; col++) {
+            var idx = (row * cols + col) * 4;
+            var brightness = maskData[idx] / 255; // 0 to 1
+
+            var ch = charStream[ci % charStream.length];
+            ci++;
+
+            if (brightness < 0.05) {
+              // Outside LUNA — dim space character
+              html += '<span style="opacity:0.04;color:#333">' + (ch === ' ' ? '&nbsp;' : '·') + '</span>';
+            } else {
+              // Inside LUNA — pretext-style: brightness controls weight + opacity + color
+              var weight = brightness > 0.7 ? 'tw7' : (brightness > 0.4 ? 'tw5' : 'tw3');
+              var italic = (row + col) % 11 === 0 ? ' tit' : '';
+              var opacity = 0.25 + brightness * 0.7;
+              var c = colors[(row + col * 3) % colors.length];
+              // Brighter = more saturated lavender, edges get yellow hints
+              var edgeDist = Math.min(brightness * 3, 1);
+              var r = Math.round(c[0] * edgeDist + 100 * (1 - edgeDist));
+              var g = Math.round(c[1] * edgeDist + 80 * (1 - edgeDist));
+              var b = Math.round(c[2] * edgeDist + 160 * (1 - edgeDist));
+
+              html += '<span class="' + weight + italic + '" style="opacity:' +
+                opacity.toFixed(2) + ';color:rgb(' + r + ',' + g + ',' + b + ')">' +
+                (ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : ch === '&' ? '&amp;' : ch === ' ' ? '&nbsp;' : ch) +
+                '</span>';
+            }
+          }
+          html += '\n';
         }
 
-        var charIdx = 0;
-        var y = lineH;
-
-        // Render text line by line with varying styles
-        while (y < h + lineH && charIdx < fullText.length) {
-          var x = 0;
-          var lineSize = baseSize + (Math.sin(y * 0.3) * 0.5);
-          var weight = y % (lineH * 3) < lineH ? '700' : (y % (lineH * 2) < lineH ? '500' : '300');
-          tCtx.font = weight + ' ' + lineSize + 'px "JetBrains Mono", monospace';
-
-          // Pick color for this line
-          var c = colors[Math.floor(y / lineH) % colors.length];
-          var opacity = 0.55 + Math.sin(y * 0.2) * 0.2;
-          tCtx.fillStyle = 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + opacity + ')';
-
-          // Get chunk that fits this line
-          var remaining = fullText.substring(charIdx);
-          // Estimate chars per line
-          var charW = tCtx.measureText('가').width;
-          var charsPerLine = Math.ceil(w / (charW * 0.6)) + 10;
-          var lineText = remaining.substring(0, charsPerLine);
-          charIdx += charsPerLine;
-
-          tCtx.fillText(lineText, 0, y);
-          y += lineH;
-        }
-
-        // Step 2: Render "LUNA" mask
-        var maskCanvas = document.createElement('canvas');
-        maskCanvas.width = w;
-        maskCanvas.height = h;
-        var mCtx = maskCanvas.getContext('2d');
-        mCtx.fillStyle = '#000';
-        mCtx.fillRect(0, 0, w, h);
-        mCtx.fillStyle = '#fff';
-        mCtx.textAlign = 'center';
-        mCtx.textBaseline = 'middle';
-        var lunaSize = Math.round(w * 0.22);
-        mCtx.font = '900 ' + lunaSize + 'px "Inter", "Helvetica Neue", sans-serif';
-        mCtx.fillText('LUNA', w / 2, h / 2);
-
-        // Step 3: Composite — only show text where LUNA mask is white
-        // Draw mask shape first
-        ctx.drawImage(maskCanvas, 0, 0);
-        // Use 'source-in' to keep only text that overlaps with LUNA
-        ctx.globalCompositeOperation = 'source-in';
-        ctx.drawImage(textCanvas, 0, 0);
-        ctx.globalCompositeOperation = 'source-over';
-
-        // Step 4: Add subtle border/outline to LUNA for definition
-        var edgeCanvas = document.createElement('canvas');
-        edgeCanvas.width = w;
-        edgeCanvas.height = h;
-        var eCtx = edgeCanvas.getContext('2d');
-        eCtx.textAlign = 'center';
-        eCtx.textBaseline = 'middle';
-        eCtx.font = '900 ' + lunaSize + 'px "Inter", "Helvetica Neue", sans-serif';
-        eCtx.strokeStyle = 'rgba(167, 139, 250, 0.08)';
-        eCtx.lineWidth = 1.5;
-        eCtx.strokeText('LUNA', w / 2, h / 2);
-        ctx.drawImage(edgeCanvas, 0, 0);
+        grid.innerHTML = html;
+        grid.style.fontSize = fontSize + 'px';
+        grid.style.maxWidth = w + 'px';
       }
 
-      document.fonts.ready.then(function() {
-        // Small delay to ensure fonts are fully loaded
-        setTimeout(render, 100);
+      document.fonts.ready.then(function() { setTimeout(render, 100); });
+
+      var resizeTimer;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(render, 200);
       });
-      window.addEventListener('resize', render);
     })();
   </script>
 </body>

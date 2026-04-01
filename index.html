@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Luna | Sooyoung Moon - AI Product Engineer</title>
-  <meta name="description" content="Luna (Sooyoung Moon) - AI Product Engineer, Team Lead at Upstage AI, Automation Enthusiast. Building the last mile of AI products.">
+  <meta name="description" content="Luna (Sooyoung Moon) - AI Product Engineer, Team Lead at Upstage AI. Packaging AI for enterprise on-premise deployment.">
   <meta name="theme-color" content="#0a0a0a">
   <meta property="og:title" content="Luna | Sooyoung Moon">
   <meta property="og:description" content="AI Product Engineer. Team Lead. The Last Mile.">
@@ -248,8 +248,8 @@
     }
 
     .hero-title-placeholder {
-      height: 120px;
-      margin-bottom: 1.5rem;
+      height: clamp(180px, 30vh, 300px);
+      margin-bottom: 2rem;
     }
 
     .hero-tagline {
@@ -262,6 +262,7 @@
       transform: translateY(20px);
       animation: fadeInUp 0.8s var(--ease-out-expo) 1.8s forwards;
       line-height: 1.8;
+      text-shadow: 0 0 20px rgba(10, 10, 10, 0.9), 0 0 40px rgba(10, 10, 10, 0.7);
     }
 
     .hero-cta {
@@ -889,12 +890,10 @@
       <div class="hero-title-placeholder"></div>
       <p class="hero-tagline">
         <span class="ko">
-          기술이 아무리 좋아도, 고객이 쓸 수 있는 형태가 아니면 의미없다.<br>
-          그 마지막 1마일을 담당합니다.
+          AI 모델을 엔터프라이즈 고객이 실제로 쓸 수 있는 제품으로 만듭니다.
         </span>
         <span class="en">
-          Technology means nothing if customers can't use it.<br>
-          I own the last mile &mdash; turning AI into products that actually work.
+          Turning AI models into products that enterprises actually use.
         </span>
       </p>
       <button class="hero-cta" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">
@@ -913,8 +912,8 @@
     <div class="reveal">
       <div class="section-label">001 / About</div>
       <h2 class="section-title">
-        <span class="ko">라스트 마일<br>담당자</span>
-        <span class="en">The Last Mile<br>Person</span>
+        <span class="ko">About<br>Me</span>
+        <span class="en">About<br>Me</span>
       </h2>
     </div>
     <div class="about-grid">
@@ -925,20 +924,12 @@
             AI 모델을 기업 고객이 온프레미스 환경에서 바로 쓸 수 있도록 패키징하는 팀을 리드하고 있습니다.
           </p>
           <p>
-            스스로를 <em>"라스트 마일 담당자"</em>라고 부릅니다.
-            엔지니어링과 비즈니스 사이를 잇는 접점에서, AI 제품을 기능적으로 동작하는 수준을 넘어
-            실제로 쓸 수 있는 형태로 만드는 일을 합니다. 팀 간 조율, 아무도 안 짜려는 글루 코드,
-            재현 불가능한 버그 디버깅, 그리고 반드시 나가야 하는 릴리즈를 책임지는 자리입니다.
+            엔지니어링과 비즈니스 사이에서 팀 간 조율, 릴리즈 관리, 고객 딜리버리까지 담당합니다.
+            반복되는 일은 자동화로 없애고, AI 에이전트를 직접 만들어 팀 운영에 활용하고 있습니다.
           </p>
           <p>
-            <strong>AI 에이전트 자동화</strong>에 진심입니다. 팀 에이전트를 직접 만들어서
-            일일 브리핑, 운영 자동화, 소규모 팀의 생산성 극대화를 실현하고 있습니다.
-            AI를 만드는 것만큼, AI를 오케스트레이션하는 능력이 미래를 결정한다고 믿습니다.
-          </p>
-          <p>
-            생명과학을 전공하고, 미국에서 컴퓨터 사이언스를 다시 시작했습니다.
-            서울대학교 대학원을 거쳐 업스테이지에 합류했고,
-            신입 동기 중 최단기로 팀 리드가 되었습니다.
+            생명과학을 전공하고 미국에서 컴퓨터 사이언스를 다시 시작했습니다.
+            서울대학교 대학원을 거쳐 업스테이지에 합류했습니다.
           </p>
         </span>
         <span class="en">
@@ -948,22 +939,12 @@
             packaging AI models for enterprise on-premise deployment.
           </p>
           <p>
-            I call myself <em>"the last mile" person</em>. I bridge engineering
-            and business, making AI products not just functional, but actually
-            usable. That means coordinating across teams, writing the glue code
-            nobody wants to write, debugging the bugs nobody can reproduce,
-            and shipping the things that need to ship.
+            I coordinate across teams, manage releases, handle customer deliveries,
+            and automate repetitive work with AI agents I build myself.
           </p>
           <p>
-            I'm focused on <strong>AI agent automation</strong> &mdash; I've built
-            team agents that deliver daily briefings, automate ops, and multiply
-            what a small team can accomplish. I believe the future belongs to
-            those who can orchestrate AI, not just build it.
-          </p>
-          <p>
-            I started in life sciences, then pivoted to Computer Science at the University of Arizona.
-            After graduate studies at Seoul National University, I joined Upstage
-            and became one of the fastest new hires to reach a team lead position.
+            I started in life sciences, pivoted to Computer Science at the University of Arizona,
+            and studied at Seoul National University before joining Upstage.
           </p>
         </span>
       </div>
@@ -989,7 +970,7 @@
           </div>
           <div class="about-card-value">
             <span class="ko">
-              서울대학교 대학원 (수료)<br>
+              서울대학교 대학원<br>
               University of Arizona, 컴퓨터과학 학사
               <small>+ 국민대학교 발효융합공학 학사</small>
             </span>
@@ -1051,8 +1032,8 @@
       <div class="timeline-item reveal">
         <div class="timeline-header">
           <h3 class="timeline-title">
-            <span class="ko">자율 팀 에이전트 (밀치크)</span>
-            <span class="en">Autonomous Team Agent (Milchick)</span>
+            <span class="ko">자율 팀 에이전트</span>
+            <span class="en">Autonomous Team Agent</span>
           </h3>
           <span class="timeline-period">2025 &ndash; 2026</span>
         </div>

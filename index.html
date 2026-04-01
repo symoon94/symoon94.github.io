@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,9 +25,11 @@
       --text-primary: #e8e8e8;
       --text-secondary: #888888;
       --text-muted: #555555;
-      --accent: #e84545;
-      --accent-dim: rgba(232, 69, 69, 0.15);
-      --accent-glow: rgba(232, 69, 69, 0.4);
+      --accent: #2dd4bf;
+      --accent-dim: rgba(45, 212, 191, 0.15);
+      --accent-glow: rgba(45, 212, 191, 0.4);
+      --accent-hover: #14b8a6;
+      --accent-subtle: #5eead4;
       --border: #222222;
       --border-hover: #333333;
       --font-mono: 'JetBrains Mono', 'Courier New', monospace;
@@ -70,16 +72,44 @@
 
     ::selection {
       background: var(--accent);
-      color: #fff;
+      color: #000;
     }
 
     a {
       color: var(--accent);
       text-decoration: none;
-      transition: opacity 0.2s ease;
+      transition: color 0.2s ease, opacity 0.2s ease;
     }
 
-    a:hover { opacity: 0.8; }
+    a:hover {
+      color: var(--accent-hover);
+      opacity: 1;
+    }
+
+    /* ========================================
+       Bilingual Toggle
+       ======================================== */
+    body.lang-en .ko { display: none !important; }
+    body.lang-ko .en { display: none !important; }
+
+    #lang-toggle {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(45, 212, 191, 0.3);
+      border-radius: 4px;
+      padding: 0.35rem 0.7rem;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    #lang-toggle:hover {
+      background: rgba(45, 212, 191, 0.25);
+      border-color: var(--accent);
+    }
 
     /* ========================================
        Navigation
@@ -116,6 +146,12 @@
     }
 
     .nav-logo span { color: var(--accent); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
 
     .nav-links {
       display: flex;
@@ -485,7 +521,7 @@
       align-items: center;
       gap: 0.4rem;
       background: var(--accent-dim);
-      border: 1px solid rgba(232, 69, 69, 0.2);
+      border: 1px solid rgba(45, 212, 191, 0.2);
       border-radius: 4px;
       padding: 0.3rem 0.6rem;
       font-family: var(--font-mono);
@@ -497,45 +533,6 @@
     .metric-value {
       font-weight: 700;
       color: var(--text-primary);
-    }
-
-    /* ========================================
-       Stats Bar
-       ======================================== */
-    .stats-bar {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 4rem;
-    }
-
-    .stat {
-      background: var(--bg-card);
-      padding: 2rem 1.5rem;
-      text-align: center;
-      transition: background 0.3s ease;
-    }
-
-    .stat:hover { background: var(--bg-card-hover); }
-
-    .stat-number {
-      font-family: var(--font-mono);
-      font-size: clamp(1.5rem, 3vw, 2.2rem);
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1;
-      margin-bottom: 0.5rem;
-    }
-
-    .stat-label {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
     }
 
     /* ========================================
@@ -779,10 +776,6 @@
       .philosophy-grid {
         grid-template-columns: 1fr;
       }
-
-      .stats-bar {
-        grid-template-columns: repeat(2, 1fr);
-      }
     }
 
     @media (max-width: 640px) {
@@ -812,12 +805,6 @@
       .hero { min-height: 600px; }
 
       .hero-title-placeholder { height: 80px; }
-
-      .stats-bar {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .stat { padding: 1.25rem 1rem; }
 
       .timeline { padding-left: 1.5rem; }
 
@@ -865,7 +852,7 @@
     }
   </style>
 </head>
-<body>
+<body class="lang-ko">
   <!-- Noise overlay -->
   <div class="noise"></div>
 
@@ -875,32 +862,43 @@
   <!-- Navigation -->
   <nav class="nav" id="nav">
     <div class="nav-logo">luna<span>.</span>dev</div>
-    <ul class="nav-links" id="navLinks">
-      <li><a href="#about">About</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#talks">Talks</a></li>
-      <li><a href="#philosophy">Philosophy</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+    <div class="nav-right">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about"><span class="ko">About</span><span class="en">About</span></a></li>
+        <li><a href="#experience"><span class="ko">Experience</span><span class="en">Experience</span></a></li>
+        <li><a href="#talks"><span class="ko">Talks</span><span class="en">Talks</span></a></li>
+        <li><a href="#contact"><span class="ko">Contact</span><span class="en">Contact</span></a></li>
+      </ul>
+      <button id="lang-toggle">EN</button>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
   </nav>
 
   <!-- Hero Section -->
   <section class="hero" id="hero">
     <canvas id="hero-canvas"></canvas>
     <div class="hero-content">
-      <p class="hero-subtitle">AI Product Engineer &bull; Team Lead &bull; Automation Enthusiast</p>
+      <p class="hero-subtitle">
+        <span class="ko">AI 프로덕트 엔지니어 &bull; 팀 리드 &bull; 자동화 덕후</span>
+        <span class="en">AI Product Engineer &bull; Team Lead &bull; Automation Enthusiast</span>
+      </p>
       <div class="hero-title-placeholder"></div>
       <p class="hero-tagline">
-        I build the last mile of AI products.<br>
-        The part where engineering meets the real world.
+        <span class="ko">
+          기술이 아무리 좋아도, 고객이 쓸 수 있는 형태가 아니면 의미없다.<br>
+          그 마지막 1마일을 담당합니다.
+        </span>
+        <span class="en">
+          Technology means nothing if customers can't use it.<br>
+          I own the last mile &mdash; turning AI into products that actually work.
+        </span>
       </p>
       <button class="hero-cta" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">
-        Scroll to explore <span class="arrow">&darr;</span>
+        <span class="ko">스크롤하여 탐색</span><span class="en">Scroll to explore</span> <span class="arrow">&darr;</span>
       </button>
     </div>
   </section>
@@ -914,56 +912,107 @@
   <section class="section" id="about">
     <div class="reveal">
       <div class="section-label">001 / About</div>
-      <h2 class="section-title">The Last Mile<br>Person</h2>
+      <h2 class="section-title">
+        <span class="ko">라스트 마일<br>담당자</span>
+        <span class="en">The Last Mile<br>Person</span>
+      </h2>
     </div>
     <div class="about-grid">
       <div class="about-text reveal reveal-delay-1">
-        <p>
-          I'm <strong>Luna (Sooyoung Moon / 문수영)</strong>, a Team Lead at
-          <strong>Upstage AI</strong> where I lead the SolarBox team &mdash;
-          packaging AI models for enterprise on-premise deployment.
-        </p>
-        <p>
-          I call myself <em>"the last mile" person</em>. I bridge engineering
-          and business, making AI products not just functional, but actually
-          usable. That means coordinating across teams, writing the glue code
-          nobody wants to write, debugging the bugs nobody can reproduce,
-          and shipping the things that need to ship.
-        </p>
-        <p>
-          I'm obsessed with <strong>AI agent automation</strong> &mdash; I've built
-          team agents that deliver daily briefings, automate ops, and multiply
-          what a small team can accomplish. I believe the future belongs to
-          those who can orchestrate AI, not just build it.
-        </p>
-        <p>
-          Outside of work, I'm bilingual (Korean/English), endlessly curious,
-          and believe in focusing on each moment with intention.
-        </p>
+        <span class="ko">
+          <p>
+            <strong>업스테이지</strong>에서 <strong>솔라박스</strong>를 만드는 <strong>문수영 (Luna)</strong>입니다.
+            AI 모델을 기업 고객이 온프레미스 환경에서 바로 쓸 수 있도록 패키징하는 팀을 리드하고 있습니다.
+          </p>
+          <p>
+            스스로를 <em>"라스트 마일 담당자"</em>라고 부릅니다.
+            엔지니어링과 비즈니스 사이를 잇는 접점에서, AI 제품을 기능적으로 동작하는 수준을 넘어
+            실제로 쓸 수 있는 형태로 만드는 일을 합니다. 팀 간 조율, 아무도 안 짜려는 글루 코드,
+            재현 불가능한 버그 디버깅, 그리고 반드시 나가야 하는 릴리즈를 책임지는 자리입니다.
+          </p>
+          <p>
+            <strong>AI 에이전트 자동화</strong>에 진심입니다. 팀 에이전트를 직접 만들어서
+            일일 브리핑, 운영 자동화, 소규모 팀의 생산성 극대화를 실현하고 있습니다.
+            AI를 만드는 것만큼, AI를 오케스트레이션하는 능력이 미래를 결정한다고 믿습니다.
+          </p>
+          <p>
+            생명과학을 전공하고, 미국에서 컴퓨터 사이언스를 다시 시작했습니다.
+            서울대학교 대학원을 거쳐 업스테이지에 합류했고,
+            신입 동기 중 최단기로 팀 리드가 되었습니다.
+          </p>
+        </span>
+        <span class="en">
+          <p>
+            I'm <strong>Luna (Sooyoung Moon)</strong>, a Team Lead at
+            <strong>Upstage AI</strong> where I lead the SolarBox team &mdash;
+            packaging AI models for enterprise on-premise deployment.
+          </p>
+          <p>
+            I call myself <em>"the last mile" person</em>. I bridge engineering
+            and business, making AI products not just functional, but actually
+            usable. That means coordinating across teams, writing the glue code
+            nobody wants to write, debugging the bugs nobody can reproduce,
+            and shipping the things that need to ship.
+          </p>
+          <p>
+            I'm focused on <strong>AI agent automation</strong> &mdash; I've built
+            team agents that deliver daily briefings, automate ops, and multiply
+            what a small team can accomplish. I believe the future belongs to
+            those who can orchestrate AI, not just build it.
+          </p>
+          <p>
+            I started in life sciences, then pivoted to Computer Science at the University of Arizona.
+            After graduate studies at Seoul National University, I joined Upstage
+            and became one of the fastest new hires to reach a team lead position.
+          </p>
+        </span>
       </div>
       <div class="about-details reveal reveal-delay-2">
         <div class="about-card">
-          <div class="about-card-label">Current Role</div>
+          <div class="about-card-label">
+            <span class="ko">현재 역할</span><span class="en">Current Role</span>
+          </div>
           <div class="about-card-value">
-            Team Lead, SolarBox @ Upstage AI
-            <small>Enterprise AI packaging &amp; deployment (Jun 2021 &ndash; Present)</small>
+            <span class="ko">
+              팀 리드, SolarBox @ Upstage AI
+              <small>엔터프라이즈 AI 패키징 & 배포 (2021.06 &ndash; 현재)</small>
+            </span>
+            <span class="en">
+              Team Lead, SolarBox @ Upstage AI
+              <small>Enterprise AI packaging &amp; deployment (Jun 2021 &ndash; Present)</small>
+            </span>
           </div>
         </div>
         <div class="about-card">
-          <div class="about-card-label">Education</div>
+          <div class="about-card-label">
+            <span class="ko">학력</span><span class="en">Education</span>
+          </div>
           <div class="about-card-value">
-            B.S. Computer Science, University of Arizona
-            <small>+ Fermentation Science, Kookmin University</small>
+            <span class="ko">
+              서울대학교 대학원 (수료)<br>
+              University of Arizona, 컴퓨터과학 학사
+              <small>+ 국민대학교 발효융합공학 학사</small>
+            </span>
+            <span class="en">
+              Seoul National University, Graduate Studies<br>
+              B.S. Computer Science, University of Arizona
+              <small>+ B.S. Fermentation Science, Kookmin University</small>
+            </span>
           </div>
         </div>
         <div class="about-card">
-          <div class="about-card-label">Languages</div>
+          <div class="about-card-label">
+            <span class="ko">언어</span><span class="en">Languages</span>
+          </div>
           <div class="about-card-value">
-            Korean (Native) &bull; English (Fluent)
+            <span class="ko">한국어 (모국어) &bull; 영어</span>
+            <span class="en">Korean (Native) &bull; English</span>
           </div>
         </div>
         <div class="about-card">
-          <div class="about-card-label">Domains</div>
+          <div class="about-card-label">
+            <span class="ko">도메인</span><span class="en">Domains</span>
+          </div>
           <div class="about-card-value">
             Document AI &bull; Enterprise SaaS &bull; Cloud Marketplaces &bull; AI Agents &bull; DevOps
           </div>
@@ -981,64 +1030,73 @@
   <section class="section" id="experience">
     <div class="reveal">
       <div class="section-label">002 / Experience</div>
-      <h2 class="section-title">Building at<br>Upstage AI</h2>
+      <h2 class="section-title">
+        <span class="ko">업스테이지에서<br>만들어 온 것들</span>
+        <span class="en">Building at<br>Upstage AI</span>
+      </h2>
       <p class="section-desc">
-        Nearly five years of full-stack ownership across 6 repositories,
-        from async inference systems to autonomous team agents.
+        <span class="ko">
+          비동기 추론 시스템부터 자율 팀 에이전트까지,
+          약 5년간 풀스택 오너십으로 쌓아 온 기록입니다.
+        </span>
+        <span class="en">
+          Nearly five years of full-stack ownership,
+          from async inference systems to autonomous team agents.
+        </span>
       </p>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-bar reveal reveal-delay-1">
-      <div class="stat">
-        <div class="stat-number" data-target="148">0</div>
-        <div class="stat-label">PRs Merged (Q1 '26)</div>
-      </div>
-      <div class="stat">
-        <div class="stat-number" data-target="211">0</div>
-        <div class="stat-label">Commits (Q1 '26)</div>
-      </div>
-      <div class="stat">
-        <div class="stat-number" data-target="6">0</div>
-        <div class="stat-label">Repos Owned</div>
-      </div>
-      <div class="stat">
-        <div class="stat-number" data-target="26">0</div>
-        <div class="stat-label">Code Reviews (Q1 '26)</div>
-      </div>
     </div>
 
     <!-- Timeline -->
     <div class="timeline">
       <div class="timeline-item reveal">
         <div class="timeline-header">
-          <h3 class="timeline-title">Autonomous Team Agent (Milchick)</h3>
+          <h3 class="timeline-title">
+            <span class="ko">자율 팀 에이전트 (밀치크)</span>
+            <span class="en">Autonomous Team Agent (Milchick)</span>
+          </h3>
           <span class="timeline-period">2025 &ndash; 2026</span>
         </div>
         <p class="timeline-desc">
-          Built a dual-LLM Slack agent powered by Solar &amp; Claude with an
-          evaluation suite, persona system, and anti-leak protections. Automates
-          daily briefings and team operations.
+          <span class="ko">
+            Solar & Claude 기반 듀얼 LLM Slack 에이전트를 구축했습니다.
+            평가 스위트, 페르소나 시스템, 정보 유출 방지 기능을 포함하며,
+            일일 브리핑과 팀 운영을 자동화합니다.
+          </span>
+          <span class="en">
+            Built a dual-LLM Slack agent powered by Solar &amp; Claude with an
+            evaluation suite, persona system, and anti-leak protections. Automates
+            daily briefings and team operations.
+          </span>
         </p>
         <div class="timeline-metrics">
           <span class="metric">Dual LLM <span class="metric-value">Solar + Claude</span></span>
-          <span class="metric">Built-in <span class="metric-value">Eval Suite</span></span>
-          <span class="metric"><span class="metric-value">Anti-leak</span> Protections</span>
+          <span class="metric"><span class="ko">내장</span><span class="en">Built-in</span> <span class="metric-value">Eval Suite</span></span>
+          <span class="metric"><span class="metric-value">Anti-leak</span> <span class="ko">보호</span><span class="en">Protections</span></span>
         </div>
       </div>
 
       <div class="timeline-item reveal">
         <div class="timeline-header">
-          <h3 class="timeline-title">Enterprise Portal Lead</h3>
+          <h3 class="timeline-title">
+            <span class="ko">엔터프라이즈 포털 리드</span>
+            <span class="en">Enterprise Portal Lead</span>
+          </h3>
           <span class="timeline-period">2024 &ndash; 2026</span>
         </div>
         <p class="timeline-desc">
-          Led development of the enterprise portal with AWS CDK infrastructure,
-          internationalization across 83 files, "Edit with Claude" AI editing
-          feature, and simultaneous launch on 3 cloud marketplaces.
+          <span class="ko">
+            AWS CDK 인프라 기반 엔터프라이즈 포털 개발을 리드했습니다.
+            83개 파일에 걸친 국제화(i18n), "Edit with Claude" AI 편집 기능,
+            3개 클라우드 마켓플레이스 동시 런칭을 수행했습니다.
+          </span>
+          <span class="en">
+            Led development of the enterprise portal with AWS CDK infrastructure,
+            internationalization across 83 files, "Edit with Claude" AI editing
+            feature, and simultaneous launch on 3 cloud marketplaces.
+          </span>
         </p>
         <div class="timeline-metrics">
-          <span class="metric">i18n across <span class="metric-value">83 files</span></span>
+          <span class="metric">i18n <span class="ko">적용</span><span class="en">across</span> <span class="metric-value">83 <span class="ko">파일</span><span class="en">files</span></span></span>
           <span class="metric"><span class="metric-value">3</span> Cloud Marketplaces</span>
           <span class="metric"><span class="metric-value">AWS CDK</span> Infra</span>
         </div>
@@ -1046,16 +1104,26 @@
 
       <div class="timeline-item reveal">
         <div class="timeline-header">
-          <h3 class="timeline-title">Async Inference System</h3>
+          <h3 class="timeline-title">
+            <span class="ko">비동기 추론 시스템</span>
+            <span class="en">Async Inference System</span>
+          </h3>
           <span class="timeline-period">2024</span>
         </div>
         <p class="timeline-desc">
-          Redesigned the inference pipeline to cut response time from 30 seconds
-          to 0.2 seconds. An 88-page document went from 21 minutes to 4 minutes.
-          System now processes 160K+ pages per day at 18x previous throughput.
+          <span class="ko">
+            추론 파이프라인을 재설계하여 응답 시간을 30초에서 0.2초로 단축했습니다.
+            88페이지 문서 처리가 21분에서 4분으로 줄었고,
+            일일 16만 페이지 이상을 처리하며 기존 대비 18배 처리량을 달성했습니다.
+          </span>
+          <span class="en">
+            Redesigned the inference pipeline to cut response time from 30 seconds
+            to 0.2 seconds. An 88-page document went from 21 minutes to 4 minutes.
+            System now processes 160K+ pages per day at 18x previous throughput.
+          </span>
         </p>
         <div class="timeline-metrics">
-          <span class="metric">Response <span class="metric-value">30s &rarr; 0.2s</span></span>
+          <span class="metric"><span class="ko">응답</span><span class="en">Response</span> <span class="metric-value">30s &rarr; 0.2s</span></span>
           <span class="metric">88pg doc <span class="metric-value">21min &rarr; 4min</span></span>
           <span class="metric"><span class="metric-value">160K+</span> pages/day</span>
           <span class="metric"><span class="metric-value">18x</span> throughput</span>
@@ -1064,51 +1132,80 @@
 
       <div class="timeline-item reveal">
         <div class="timeline-header">
-          <h3 class="timeline-title">Service Stability: The 10-Month Bug</h3>
+          <h3 class="timeline-title">
+            <span class="ko">서비스 안정화: 10개월짜리 버그</span>
+            <span class="en">Service Stability: The 10-Month Bug</span>
+          </h3>
           <span class="timeline-period">2023 &ndash; 2024</span>
         </div>
         <p class="timeline-desc">
-          Traced a 10-month intermittent panic to a thread-unsafe go-fitz library,
-          eliminating 10,000+ daily segfaults. The kind of bug that makes you
-          question reality &mdash; then makes you a better engineer.
+          <span class="ko">
+            10개월간 간헐적으로 발생하던 패닉의 원인을 thread-unsafe go-fitz 라이브러리로 추적하여
+            일 10,000건 이상의 segfault를 제거했습니다. 현실을 의심하게 만들지만,
+            결국 더 나은 엔지니어로 만들어 주는 그런 종류의 버그였습니다.
+          </span>
+          <span class="en">
+            Traced a 10-month intermittent panic to a thread-unsafe go-fitz library,
+            eliminating 10,000+ daily segfaults. The kind of bug that makes you
+            question reality &mdash; then makes you a better engineer.
+          </span>
         </p>
         <div class="timeline-metrics">
-          <span class="metric"><span class="metric-value">10-month</span> mystery bug</span>
-          <span class="metric"><span class="metric-value">10K+</span> daily segfaults eliminated</span>
-          <span class="metric">Root cause: <span class="metric-value">thread-unsafe go-fitz</span></span>
+          <span class="metric"><span class="metric-value">10<span class="ko">개월</span><span class="en">-month</span></span> <span class="ko">미스터리 버그</span><span class="en">mystery bug</span></span>
+          <span class="metric"><span class="metric-value">10K+</span> <span class="ko">일일 segfault 제거</span><span class="en">daily segfaults eliminated</span></span>
+          <span class="metric"><span class="ko">원인:</span><span class="en">Root cause:</span> <span class="metric-value">thread-unsafe go-fitz</span></span>
         </div>
       </div>
 
       <div class="timeline-item reveal">
         <div class="timeline-header">
-          <h3 class="timeline-title">Dev Server Optimization</h3>
+          <h3 class="timeline-title">
+            <span class="ko">개발 서버 최적화</span>
+            <span class="en">Dev Server Optimization</span>
+          </h3>
           <span class="timeline-period">2023</span>
         </div>
         <p class="timeline-desc">
-          Achieved a 56% startup time reduction (50s down to 22s) by deleting
-          1,331 lines of code and adding only 6. Sometimes the best engineering
-          is subtractive.
+          <span class="ko">
+            코드 1,331줄을 삭제하고 6줄만 추가하여 시작 시간을 56% 단축했습니다 (50초 &rarr; 22초).
+            때로는 최고의 엔지니어링은 빼는 것입니다.
+          </span>
+          <span class="en">
+            Achieved a 56% startup time reduction (50s down to 22s) by deleting
+            1,331 lines of code and adding only 6. Sometimes the best engineering
+            is subtractive.
+          </span>
         </p>
         <div class="timeline-metrics">
-          <span class="metric">Startup <span class="metric-value">50s &rarr; 22s</span></span>
-          <span class="metric"><span class="metric-value">-56%</span> reduction</span>
+          <span class="metric"><span class="ko">시작 시간</span><span class="en">Startup</span> <span class="metric-value">50s &rarr; 22s</span></span>
+          <span class="metric"><span class="metric-value">-56%</span> <span class="ko">감소</span><span class="en">reduction</span></span>
           <span class="metric"><span class="metric-value">-1331</span> lines / <span class="metric-value">+6</span> lines</span>
         </div>
       </div>
 
       <div class="timeline-item reveal">
         <div class="timeline-header">
-          <h3 class="timeline-title">SolarBox 2.5 Release</h3>
+          <h3 class="timeline-title">
+            <span class="ko">SolarBox 2.5 릴리즈</span>
+            <span class="en">SolarBox 2.5 Release</span>
+          </h3>
           <span class="timeline-period">2025 &ndash; 2026</span>
         </div>
         <p class="timeline-desc">
-          Coordinated a major release across 4+ teams, shipping 6 AI products
-          to 3 cloud marketplaces simultaneously. Cross-functional orchestration
-          at scale.
+          <span class="ko">
+            4개 이상의 팀을 조율하여 6개 AI 제품을 3개 클라우드 마켓플레이스에
+            동시 출시하는 메이저 릴리즈를 진행했습니다.
+            대규모 크로스펑셔널 오케스트레이션의 경험이었습니다.
+          </span>
+          <span class="en">
+            Coordinated a major release across 4+ teams, shipping 6 AI products
+            to 3 cloud marketplaces simultaneously. Cross-functional orchestration
+            at scale.
+          </span>
         </p>
         <div class="timeline-metrics">
-          <span class="metric"><span class="metric-value">4+</span> teams coordinated</span>
-          <span class="metric"><span class="metric-value">6</span> AI products</span>
+          <span class="metric"><span class="metric-value">4+</span> <span class="ko">팀 조율</span><span class="en">teams coordinated</span></span>
+          <span class="metric"><span class="metric-value">6</span> AI <span class="ko">제품</span><span class="en">products</span></span>
           <span class="metric"><span class="metric-value">3</span> cloud marketplaces</span>
         </div>
       </div>
@@ -1124,47 +1221,74 @@
   <section class="section" id="talks">
     <div class="reveal">
       <div class="section-label">003 / Talks</div>
-      <h2 class="section-title">Speaking &amp;<br>Sharing</h2>
+      <h2 class="section-title">
+        <span class="ko">발표 &amp;<br>공유</span>
+        <span class="en">Speaking &amp;<br>Sharing</span>
+      </h2>
       <p class="section-desc">
-        Sharing real stories from the trenches &mdash; what it's actually like
-        to build AI products, lead teams, and grow as an engineer.
+        <span class="ko">
+          현장의 진짜 이야기를 나눕니다 &mdash; AI 제품을 만들고,
+          팀을 이끌고, 엔지니어로 성장하면서 겪은 것들.
+        </span>
+        <span class="en">
+          Sharing real stories from the trenches &mdash; what it's actually like
+          to build AI products, lead teams, and grow as an engineer.
+        </span>
       </p>
     </div>
 
     <div class="talks-grid">
       <div class="talk-card reveal reveal-delay-1">
         <div class="talk-date">Mar 2026</div>
-        <h3 class="talk-title">From Junior Developer to Tech Lead</h3>
+        <h3 class="talk-title">
+          <span class="ko">주니어 개발자에서 테크 리드까지</span>
+          <span class="en">From Junior Developer to Tech Lead</span>
+        </h3>
         <p class="talk-venue">Women Techmakers Korea 2026</p>
-        <a href="https://www.slideshare.net/sooyoungmoon" target="_blank" rel="noopener noreferrer" class="talk-link">
-          View slides &rarr;
+        <a href="https://www.slideshare.net/SooyoungMoon3" target="_blank" rel="noopener noreferrer" class="talk-link">
+          <span class="ko">슬라이드 보기</span><span class="en">View slides</span> &rarr;
         </a>
       </div>
 
       <div class="talk-card reveal reveal-delay-2">
         <div class="talk-date">Nov 2025</div>
-        <h3 class="talk-title">Making it Roll with AI: Survival Skills for Small Teams</h3>
+        <h3 class="talk-title">
+          <span class="ko">AI로 굴러가게 만들기: 작은 팀의 서바이벌 스킬</span>
+          <span class="en">Making it Roll with AI: Survival Skills for Small Teams</span>
+        </h3>
         <p class="talk-venue">GDG Incheon DevFest 2025</p>
-        <a href="https://www.slideshare.net/sooyoungmoon" target="_blank" rel="noopener noreferrer" class="talk-link">
-          View slides &rarr;
+        <a href="https://www.slideshare.net/SooyoungMoon3" target="_blank" rel="noopener noreferrer" class="talk-link">
+          <span class="ko">슬라이드 보기</span><span class="en">View slides</span> &rarr;
         </a>
       </div>
 
       <div class="talk-card reveal reveal-delay-3">
         <div class="talk-date">Nov 2025</div>
-        <h3 class="talk-title">From Job Prep to 5th Year at an AI Startup</h3>
-        <p class="talk-venue">Chung-Ang University Guest Lecture</p>
-        <a href="https://www.slideshare.net/sooyoungmoon" target="_blank" rel="noopener noreferrer" class="talk-link">
-          View slides &rarr;
+        <h3 class="talk-title">
+          <span class="ko">취준생에서 AI 스타트업 5년차까지</span>
+          <span class="en">From Job Prep to 5th Year at an AI Startup</span>
+        </h3>
+        <p class="talk-venue">
+          <span class="ko">중앙대학교 특강</span>
+          <span class="en">Chung-Ang University Guest Lecture</span>
+        </p>
+        <a href="https://www.slideshare.net/SooyoungMoon3" target="_blank" rel="noopener noreferrer" class="talk-link">
+          <span class="ko">슬라이드 보기</span><span class="en">View slides</span> &rarr;
         </a>
       </div>
 
       <div class="talk-card reveal reveal-delay-4">
         <div class="talk-date">Oct 2025</div>
-        <h3 class="talk-title">The Journey of Document AI</h3>
-        <p class="talk-venue">Jeju AI Conference &amp; Hanbit+ DevGround 2025</p>
-        <a href="https://www.slideshare.net/sooyoungmoon" target="_blank" rel="noopener noreferrer" class="talk-link">
-          View slides &rarr;
+        <h3 class="talk-title">
+          <span class="ko">Document AI의 여정</span>
+          <span class="en">The Journey of Document AI</span>
+        </h3>
+        <p class="talk-venue">
+          <span class="ko">제주 AI 컨퍼런스 &amp; 한빛+ DevGround 2025</span>
+          <span class="en">Jeju AI Conference &amp; Hanbit+ DevGround 2025</span>
+        </p>
+        <a href="https://www.slideshare.net/SooyoungMoon3" target="_blank" rel="noopener noreferrer" class="talk-link">
+          <span class="ko">슬라이드 보기</span><span class="en">View slides</span> &rarr;
         </a>
       </div>
     </div>
@@ -1175,72 +1299,19 @@
     - - - - - - - - - - - - // 004 - - - - - - - - - - - -
   </div>
 
-  <!-- Philosophy Section -->
-  <section class="section" id="philosophy">
-    <div class="reveal">
-      <div class="section-label">004 / Philosophy</div>
-      <h2 class="section-title">How I<br>Think</h2>
-    </div>
-
-    <div class="philosophy-grid">
-      <div class="philosophy-card reveal reveal-delay-1">
-        <div class="philosophy-number">01</div>
-        <div class="philosophy-quote">Hack the world.</div>
-        <p class="philosophy-desc">
-          Every system has leverage points. Find them, understand them,
-          then use them to create disproportionate impact.
-        </p>
-      </div>
-
-      <div class="philosophy-card reveal reveal-delay-2">
-        <div class="philosophy-number">02</div>
-        <div class="philosophy-quote">Build unique skills AI can't replicate.</div>
-        <p class="philosophy-desc">
-          AI is a multiplier, not a replacement. The value is in judgment,
-          taste, and the ability to navigate ambiguity &mdash; the human layer.
-        </p>
-      </div>
-
-      <div class="philosophy-card reveal reveal-delay-3">
-        <div class="philosophy-number">03</div>
-        <div class="philosophy-quote">일단 대충 다 해놓고 돌아가서 다듬기</div>
-        <p class="philosophy-desc">
-          Get the rough draft done first, then go back and polish.
-          Momentum beats perfection. Ship, iterate, improve.
-        </p>
-      </div>
-
-      <div class="philosophy-card reveal reveal-delay-4">
-        <div class="philosophy-number">04</div>
-        <div class="philosophy-quote">More agents, more productivity.</div>
-        <p class="philosophy-desc">
-          The future belongs to those who can orchestrate AI agents.
-          One person with the right agents is a team.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ASCII Divider -->
-  <div class="ascii-divider" aria-hidden="true">
-    - - - - - - - - - - - - // 005 - - - - - - - - - - - -
-  </div>
-
   <!-- Contact Section -->
   <section class="contact-section" id="contact">
     <div class="reveal">
-      <div class="section-label" style="justify-content: center;">005 / Contact</div>
-      <h2 class="section-title">Let's<br>Connect</h2>
+      <div class="section-label" style="justify-content: center;">004 / Contact</div>
+      <h2 class="section-title">
+        <span class="ko">연락하기</span>
+        <span class="en">Let's<br>Connect</span>
+      </h2>
     </div>
 
     <div class="contact-motto reveal reveal-delay-1">
-      매 순간에 집중하고 나의 감정을 인지해서<br>
-      더 좋은 방향으로 갈 수 있게 행동하자.
-      <br><br>
-      <span style="color: var(--text-muted); font-size: 0.75rem;">
-        Focus on each moment, recognize my emotions,<br>
-        and act to move in a better direction.
-      </span>
+      <span class="ko">함께 이야기하고 싶으시다면, 편하게 연락주세요.</span>
+      <span class="en">Want to connect? Feel free to reach out.</span>
     </div>
 
     <div class="contact-links reveal reveal-delay-2">
@@ -1252,11 +1323,11 @@
         <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
         GitHub
       </a>
-      <a href="https://www.linkedin.com/in/sooyoungmoon" target="_blank" rel="noopener noreferrer" class="contact-link">
+      <a href="https://www.linkedin.com/in/sooyoung-moon/" target="_blank" rel="noopener noreferrer" class="contact-link">
         <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
         LinkedIn
       </a>
-      <a href="https://www.slideshare.net/sooyoungmoon" target="_blank" rel="noopener noreferrer" class="contact-link">
+      <a href="https://www.slideshare.net/SooyoungMoon3" target="_blank" rel="noopener noreferrer" class="contact-link">
         <svg viewBox="0 0 24 24"><path d="M2 0v16h6v6l6-6h4l4-4V0H2zm18 10l-2 2h-4l-4 4v-4H4V2h16v8z"/></svg>
         SlideShare
       </a>
@@ -1265,13 +1336,44 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <p>Built with <span>&hearts;</span> and too much coffee &mdash; Luna / Sooyoung Moon &copy; 2026</p>
+    <p>
+      <span class="ko">Built with <span>&hearts;</span> and too much coffee &mdash; Luna / 문수영 &copy; 2026</span>
+      <span class="en">Built with <span>&hearts;</span> and too much coffee &mdash; Luna / Sooyoung Moon &copy; 2026</span>
+    </p>
   </footer>
 
   <!-- ========================================
        JavaScript
        ======================================== -->
   <script>
+    // ========================================
+    // Language Toggle
+    // ========================================
+    (function() {
+      var langToggle = document.getElementById('lang-toggle');
+      var body = document.body;
+
+      // Load saved preference, default to Korean
+      var savedLang = localStorage.getItem('site-lang') || 'ko';
+      body.classList.remove('lang-ko', 'lang-en');
+      body.classList.add('lang-' + savedLang);
+      langToggle.textContent = savedLang === 'ko' ? 'EN' : '한국어';
+
+      langToggle.addEventListener('click', function() {
+        var isKo = body.classList.contains('lang-ko');
+        body.classList.remove('lang-ko', 'lang-en');
+        if (isKo) {
+          body.classList.add('lang-en');
+          langToggle.textContent = '한국어';
+          localStorage.setItem('site-lang', 'en');
+        } else {
+          body.classList.add('lang-ko');
+          langToggle.textContent = 'EN';
+          localStorage.setItem('site-lang', 'ko');
+        }
+      });
+    })();
+
     // ========================================
     // Navigation
     // ========================================
@@ -1342,43 +1444,6 @@
       reveals.forEach(function(el) {
         observer.observe(el);
       });
-    })();
-
-    // ========================================
-    // Counter Animation
-    // ========================================
-    (function() {
-      var counters = document.querySelectorAll('.stat-number');
-      var animated = new Set();
-
-      var observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting && !animated.has(entry.target)) {
-            animated.add(entry.target);
-            var target = parseInt(entry.target.getAttribute('data-target'));
-            var current = 0;
-            var duration = 1500;
-            var startTime = null;
-
-            function step(timestamp) {
-              if (!startTime) startTime = timestamp;
-              var progress = Math.min((timestamp - startTime) / duration, 1);
-              // ease-out-quart
-              var eased = 1 - Math.pow(1 - progress, 4);
-              current = Math.floor(eased * target);
-              entry.target.textContent = current + (target > 100 ? '+' : '');
-              if (progress < 1) {
-                requestAnimationFrame(step);
-              } else {
-                entry.target.textContent = target + (target > 100 ? '+' : '');
-              }
-            }
-            requestAnimationFrame(step);
-          }
-        });
-      }, { threshold: 0.5 });
-
-      counters.forEach(function(c) { observer.observe(c); });
     })();
 
     // ========================================
@@ -1564,10 +1629,10 @@
         '  // Soft edge',
         '  float alpha = smoothstep(0.5, 0.15, d) * vAlpha;',
         '',
-        '  // Color: warm coral with subtle variation',
-        '  vec3 color1 = vec3(0.91, 0.27, 0.27); // #e84545',
-        '  vec3 color2 = vec3(1.0, 0.45, 0.35);  // warmer',
-        '  vec3 color3 = vec3(0.95, 0.55, 0.45); // softer',
+        '  // Color: warm teal/mint with subtle variation',
+        '  vec3 color1 = vec3(0.176, 0.831, 0.749); // #2dd4bf teal-400',
+        '  vec3 color2 = vec3(0.078, 0.722, 0.651); // #14b8a6 teal-500',
+        '  vec3 color3 = vec3(0.369, 0.918, 0.831); // #5eead4 teal-300',
         '  vec3 color = mix(color1, mix(color2, color3, vRandom), vRandom * 0.5);',
         '',
         '  // Subtle pulse',
@@ -1635,7 +1700,7 @@
         '  float d = length(gl_PointCoord - vec2(0.5));',
         '  if (d > 0.5) discard;',
         '  float alpha = smoothstep(0.5, 0.2, d) * vAlpha;',
-        '  gl_FragColor = vec4(0.91, 0.27, 0.27, alpha * 0.3);',
+        '  gl_FragColor = vec4(0.176, 0.831, 0.749, alpha * 0.3);',
         '}',
       ].join('\n');
 

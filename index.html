@@ -1776,29 +1776,31 @@
 
     // ========================================
     // Typographic Philosophy Canvas
+    // Text flows naturally, LUNA acts as mask
     // ========================================
     (function() {
       var canvas = document.getElementById('typoCanvas');
       if (!canvas) return;
       var ctx = canvas.getContext('2d');
 
+      // Each phrase appears only once — no duplicates
       var phrases = [
         'Hack the world!',
         '규칙적인 삶',
         'Life is unfair. Use your unfair advantage!',
         '일단 대충 다 해놓고 돌아가서 다듬기',
-        'More agents, more productivity',
+        'More agents, more productivity.',
         '어제보다 나은 나',
-        'Good habits are all you need',
-        'Build unique skills AI can\'t replicate',
+        'Good habits are all you need.',
+        'Build unique skills AI can\'t replicate.',
         'You need ENERGY!',
         'Stop being perfect. You are enough.',
         '날라다니자!',
         'Testing the limits!',
-        'One step more',
+        'One step more.',
         'AI를 세상에서 제일 잘 쓰는 사람',
         '그럼에도 불구하고',
-        'push the limit',
+        'Push the limit.',
         '본질 & 왜',
         '숲:나무=8:2',
         '미친 실행력',
@@ -1816,99 +1818,125 @@
         '철학을 가진다',
         '럭키비키 마인드',
         '실수를 지금 해야 나중에 덜 한다',
-        'Find a cheat code for life',
+        'Find a cheat code for life.',
         '자동사냥을 돌린다',
         '남들처럼 하면 절대 크게 성공 못한다',
         '창의적으로 문제를 해결하는 것',
-        'Throw away the NPC mindset',
         '물음표를 가지는 것',
-        'radical candor',
+        'Radical candor.',
+        '컨디션 조절을 잘 하자',
+        '하나만 집중하고 숨쉬듯 자연스러워지면 다음 것',
+        '끊임없는 호기심',
+        '문제 해결 덕질',
       ];
 
       function render() {
         var dpr = Math.min(window.devicePixelRatio || 1, 2);
         var w = Math.min(window.innerWidth, 1200);
-        var h = Math.round(w * 0.32);
+        var h = Math.round(w * 0.35);
 
         canvas.width = w * dpr;
         canvas.height = h * dpr;
         canvas.style.width = w + 'px';
         canvas.style.height = h + 'px';
         ctx.scale(dpr, dpr);
+        ctx.clearRect(0, 0, w, h);
 
-        // 1. Render "LUNA" as mask
+        var mobile = w < 600;
+        var lineH = mobile ? 8 : 11;
+        var baseSize = mobile ? 6 : 8;
+        var gap = '  ·  ';
+
+        // Step 1: Build the full text canvas (text flows naturally, no overlap)
+        var textCanvas = document.createElement('canvas');
+        textCanvas.width = w;
+        textCanvas.height = h;
+        var tCtx = textCanvas.getContext('2d');
+        tCtx.clearRect(0, 0, w, h);
+
+        var colors = [
+          [167,139,250], // lavender
+          [196,181,253], // light lavender
+          [139,92,246],  // violet
+          [245,208,100], // warm yellow
+          [253,224,137], // soft yellow
+          [200,160,255], // pastel purple
+        ];
+
+        // Concatenate all phrases into a continuous string with separators
+        var fullText = phrases.join(gap);
+        // Repeat enough to fill the canvas
+        while (fullText.length < 8000) {
+          fullText += gap + phrases.join(gap);
+        }
+
+        var charIdx = 0;
+        var y = lineH;
+
+        // Render text line by line with varying styles
+        while (y < h + lineH && charIdx < fullText.length) {
+          var x = 0;
+          var lineSize = baseSize + (Math.sin(y * 0.3) * 0.5);
+          var weight = y % (lineH * 3) < lineH ? '700' : (y % (lineH * 2) < lineH ? '500' : '300');
+          tCtx.font = weight + ' ' + lineSize + 'px "JetBrains Mono", monospace';
+
+          // Pick color for this line
+          var c = colors[Math.floor(y / lineH) % colors.length];
+          var opacity = 0.55 + Math.sin(y * 0.2) * 0.2;
+          tCtx.fillStyle = 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + opacity + ')';
+
+          // Get chunk that fits this line
+          var remaining = fullText.substring(charIdx);
+          // Estimate chars per line
+          var charW = tCtx.measureText('가').width;
+          var charsPerLine = Math.ceil(w / (charW * 0.6)) + 10;
+          var lineText = remaining.substring(0, charsPerLine);
+          charIdx += charsPerLine;
+
+          tCtx.fillText(lineText, 0, y);
+          y += lineH;
+        }
+
+        // Step 2: Render "LUNA" mask
         var maskCanvas = document.createElement('canvas');
         maskCanvas.width = w;
         maskCanvas.height = h;
-        var maskCtx = maskCanvas.getContext('2d');
-        maskCtx.fillStyle = '#000';
-        maskCtx.fillRect(0, 0, w, h);
-        maskCtx.fillStyle = '#fff';
-        maskCtx.textAlign = 'center';
-        maskCtx.textBaseline = 'middle';
-        var fontSize = Math.round(w * 0.22);
-        maskCtx.font = '900 ' + fontSize + 'px "Inter", "Helvetica Neue", sans-serif';
-        maskCtx.fillText('LUNA', w / 2, h / 2);
-        var maskData = maskCtx.getImageData(0, 0, w, h).data;
+        var mCtx = maskCanvas.getContext('2d');
+        mCtx.fillStyle = '#000';
+        mCtx.fillRect(0, 0, w, h);
+        mCtx.fillStyle = '#fff';
+        mCtx.textAlign = 'center';
+        mCtx.textBaseline = 'middle';
+        var lunaSize = Math.round(w * 0.22);
+        mCtx.font = '900 ' + lunaSize + 'px "Inter", "Helvetica Neue", sans-serif';
+        mCtx.fillText('LUNA', w / 2, h / 2);
 
-        // 2. Fill with philosophy text
-        ctx.clearRect(0, 0, w, h);
+        // Step 3: Composite — only show text where LUNA mask is white
+        // Draw mask shape first
+        ctx.drawImage(maskCanvas, 0, 0);
+        // Use 'source-in' to keep only text that overlaps with LUNA
+        ctx.globalCompositeOperation = 'source-in';
+        ctx.drawImage(textCanvas, 0, 0);
+        ctx.globalCompositeOperation = 'source-over';
 
-        var lineHeight = w < 600 ? 7 : 9;
-        var baseFontSize = w < 600 ? 5.5 : 7;
-        var phraseIdx = 0;
-        var colors = [
-          'rgba(167,139,250,', // lavender
-          'rgba(196,181,253,', // light lavender
-          'rgba(139,92,246,',  // violet
-          'rgba(245,208,100,', // warm yellow
-          'rgba(253,224,137,', // soft yellow
-        ];
-
-        for (var y = 2; y < h; y += lineHeight) {
-          var x = 0;
-          var attempts = 0;
-          while (x < w && attempts < 500) {
-            var phrase = phrases[phraseIdx % phrases.length];
-            phraseIdx++;
-            attempts++;
-
-            var size = baseFontSize + Math.random() * 2;
-            var weight = Math.random() > 0.6 ? '700' : (Math.random() > 0.5 ? '500' : '300');
-            var italic = Math.random() > 0.85 ? 'italic ' : '';
-            ctx.font = italic + weight + ' ' + size + 'px "JetBrains Mono", monospace';
-
-            var textW = ctx.measureText(phrase + '  ').width;
-
-            // Check if center of text is inside LUNA mask
-            var sampleX = Math.round(x + textW / 2);
-            var sampleY = Math.round(y + lineHeight / 2);
-            if (sampleX >= 0 && sampleX < w && sampleY >= 0 && sampleY < h) {
-              var idx = (sampleY * w + sampleX) * 4;
-              var brightness = maskData[idx];
-
-              if (brightness > 128) {
-                // Inside LUNA - draw with color
-                var opacity = 0.4 + Math.random() * 0.5;
-                var color = colors[Math.floor(Math.random() * colors.length)];
-                ctx.fillStyle = color + opacity + ')';
-                ctx.fillText(phrase, x, y + lineHeight * 0.75);
-              }
-            }
-
-            x += textW;
-          }
-        }
-
-        // 3. Add subtle glow overlay
-        var glow = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w * 0.4);
-        glow.addColorStop(0, 'rgba(167, 139, 250, 0.03)');
-        glow.addColorStop(1, 'rgba(167, 139, 250, 0)');
-        ctx.fillStyle = glow;
-        ctx.fillRect(0, 0, w, h);
+        // Step 4: Add subtle border/outline to LUNA for definition
+        var edgeCanvas = document.createElement('canvas');
+        edgeCanvas.width = w;
+        edgeCanvas.height = h;
+        var eCtx = edgeCanvas.getContext('2d');
+        eCtx.textAlign = 'center';
+        eCtx.textBaseline = 'middle';
+        eCtx.font = '900 ' + lunaSize + 'px "Inter", "Helvetica Neue", sans-serif';
+        eCtx.strokeStyle = 'rgba(167, 139, 250, 0.08)';
+        eCtx.lineWidth = 1.5;
+        eCtx.strokeText('LUNA', w / 2, h / 2);
+        ctx.drawImage(edgeCanvas, 0, 0);
       }
 
-      document.fonts.ready.then(render);
+      document.fonts.ready.then(function() {
+        // Small delay to ensure fonts are fully loaded
+        setTimeout(render, 100);
+      });
       window.addEventListener('resize', render);
     })();
   </script>

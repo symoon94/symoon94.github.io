@@ -18,6 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     /* ========================================
        CSS Custom Properties
@@ -223,6 +224,15 @@
       overflow: hidden;
     }
 
+    #hero-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
     .hero-content {
       position: relative;
       z-index: 2;
@@ -242,42 +252,16 @@
       color: var(--accent);
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
       opacity: 0;
       transform: translateY(20px);
       animation: fadeInUp 0.8s var(--ease-out-expo) 1.5s forwards;
     }
 
-    .hero-grid {
-      font-family: var(--font-mono);
-      line-height: 1.15;
-      white-space: pre;
-      text-align: center;
-      overflow: hidden;
-      cursor: default;
-      margin: 2.5rem 0;
-      position: relative;
-      z-index: 2;
+    .hero-title-placeholder {
+      height: clamp(180px, 30vh, 300px);
+      margin-bottom: 2rem;
     }
-
-    .hero-grid span {
-      display: inline;
-      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease;
-    }
-
-    .hero-grid span.flying {
-      opacity: 0;
-      display: inline-block;
-    }
-
-    .hero-grid span.landed {
-      display: inline-block;
-    }
-
-    /* Weight classes for pretext-style */
-    .tw3 { font-weight: 300; }
-    .tw5 { font-weight: 500; }
-    .tw7 { font-weight: 700; }
 
     .hero-tagline {
       font-family: var(--font-mono);
@@ -840,6 +824,8 @@
         border-radius: 4px;
       }
 
+      .hero-title-placeholder { height: clamp(100px, 22vh, 160px); }
+
       .hero-tagline {
         font-size: 0.7rem;
         max-width: 90vw;
@@ -989,12 +975,13 @@
 
   <!-- Hero Section -->
   <section class="hero" id="hero">
+    <canvas id="hero-canvas"></canvas>
     <div class="hero-content">
       <p class="hero-subtitle">
         <span class="ko">AI 프로덕트 엔지니어 &bull; 팀 리드</span>
         <span class="en">AI Product Engineer &bull; Team Lead</span>
       </p>
-      <div id="heroGrid" class="hero-grid"></div>
+      <div class="hero-title-placeholder"></div>
       <p class="hero-tagline">
         <span class="ko">
           AI 모델을 엔터프라이즈 고객이 실제로 쓸 수 있는 제품으로 만듭니다.
@@ -1515,168 +1502,334 @@
     })();
 
     // ========================================
-    // Animated Hero Grid - "LUNA" Text with Flying Characters
+    // Three.js Particle System - "LUNA" Text
     // ========================================
     (function() {
-      var grid = document.getElementById('heroGrid');
-      if (!grid) return;
+      // Wait for fonts to load so canvas text rendering uses JetBrains Mono
+      document.fonts.ready.then(initParticleSystem);
 
-      var phrases = [
-        'Hack the world!',
-        '규칙적인 삶',
-        'Life is unfair. Use your unfair advantage!',
-        '일단 대충 다 해놓고 돌아가서 다듬기',
-        'More agents, more productivity.',
-        '어제보다 나은 나',
-        'Good habits are all you need.',
-        'Build unique skills AI can\'t replicate.',
-        'You need ENERGY!',
-        'Stop being perfect. You are enough.',
-        '날라다니자!',
-        'Testing the limits!',
-        'One step more.',
-        'AI를 세상에서 제일 잘 쓰는 사람',
-        '그럼에도 불구하고',
-        'Push the limit.',
-        '본질 & 왜',
-        '미친 실행력',
-        '약속을 지킨다',
-        '가족 > 업무 > 나',
-        'Once the steps twist, the dance begins!',
-        '레버리지',
-        'NPC 마인드 버리기',
-        '위험한 선택을 한다',
-        '2분 안에 액션',
-        'COO처럼 일한다',
-        '테크 인플루언서',
-        '패턴을 깨는 것',
-        '높은 자존감',
-        '철학을 가진다',
-        '럭키비키 마인드',
-        'Find a cheat code for life.',
-        '자동사냥을 돌린다',
-        '창의적 문제 해결',
-        '물음표를 가지는 것',
-        'Radical candor.',
-        '컨디션 조절',
-        '끊임없는 호기심',
-        '문제 해결 덕질',
-        '숲:나무=8:2',
-      ];
+      function initParticleSystem() {
+      var canvas = document.getElementById('hero-canvas');
+      var renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true,
+        alpha: true
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor(0x000000, 0);
 
-      // Build a continuous character stream from phrases
-      var allChars = phrases.join(' · ');
-      var charStream = allChars;
-      while (charStream.length < 6000) charStream += ' · ' + allChars;
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(
+        50,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      camera.position.z = 5;
 
-      var colors = [
-        [167,139,250], // lavender
-        [196,181,253], // light lavender
-        [139,92,246],  // violet
-        [245,208,100], // warm yellow
-        [253,224,137], // soft yellow
-      ];
+      // Mouse tracking
+      var mouse = { x: 0, y: 0, worldX: 0, worldY: 0 };
+      var raycaster = new THREE.Raycaster();
+      var mouseVec = new THREE.Vector2();
 
-      function render() {
-        var w = Math.min(window.innerWidth, 1100);
-        var mobile = w < 640;
-        var fontSize = mobile ? 8 : 12;
-        var cols = Math.floor(w / (fontSize * 0.62));
-        var rows = Math.floor((w * 0.32) / (fontSize * 1.15));
-        if (mobile) rows = Math.floor((w * 0.42) / (fontSize * 1.15));
-        var flyDist = mobile ? 150 : 300;
+      document.addEventListener('mousemove', function(e) {
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        // Convert to world coordinates for particle interaction
+        mouseVec.set(mouse.x, mouse.y);
+        raycaster.setFromCamera(mouseVec, camera);
+        var plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+        var intersection = new THREE.Vector3();
+        raycaster.ray.intersectPlane(plane, intersection);
+        if (intersection) {
+          mouse.worldX = intersection.x;
+          mouse.worldY = intersection.y;
+        }
+      });
 
-        // Step 1: Render LUNA to offscreen canvas to get brightness map
-        var mc = document.createElement('canvas');
-        mc.width = cols;
-        mc.height = rows;
-        var mCtx = mc.getContext('2d');
-        mCtx.fillStyle = '#000';
-        mCtx.fillRect(0, 0, cols, rows);
-        mCtx.fillStyle = '#fff';
-        mCtx.textAlign = 'center';
-        mCtx.textBaseline = 'middle';
-        var lunaFontSize = Math.round(rows * 0.85);
-        mCtx.font = '900 ' + lunaFontSize + 'px Inter, Helvetica, sans-serif';
-        mCtx.fillText('LUNA', cols / 2, rows / 2);
-        var maskData = mCtx.getImageData(0, 0, cols, rows).data;
+      // Generate text positions from an off-screen canvas
+      function getTextPositions(text, width, height, fontSize) {
+        var offCanvas = document.createElement('canvas');
+        offCanvas.width = width;
+        offCanvas.height = height;
+        var ctx = offCanvas.getContext('2d');
 
-        // Step 2: Build spans
-        var spans = [];
-        var ci = 0;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold ' + fontSize + 'px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, width / 2, height / 2);
 
-        for (var row = 0; row < rows; row++) {
-          for (var col = 0; col < cols; col++) {
-            var idx = (row * cols + col) * 4;
-            var brightness = maskData[idx] / 255;
+        var imageData = ctx.getImageData(0, 0, width, height);
+        var positions = [];
+        var sampling = isMobile ? 2 : 3; // sample every N pixels - tighter on mobile
 
-            var ch = charStream[ci % charStream.length];
-            ci++;
-
-            var escaped = ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : ch === '&' ? '&amp;' : ch === ' ' ? '&nbsp;' : ch;
-
-            if (brightness < 0.05) {
-              // Outside LUNA: dim dot, no animation
-              spans.push('<span style="opacity:0.04;color:#333">' + (ch === ' ' ? '&nbsp;' : '·') + '</span>');
-            } else {
-              // Inside LUNA: animated character
-              var weight = brightness > 0.7 ? 'tw7' : (brightness > 0.4 ? 'tw5' : 'tw3');
-              var opacity = 0.25 + brightness * 0.7;
-              var c = colors[(row + col * 3) % colors.length];
-              var edgeDist = Math.min(brightness * 3, 1);
-              var r = Math.round(c[0] * edgeDist + 100 * (1 - edgeDist));
-              var g = Math.round(c[1] * edgeDist + 80 * (1 - edgeDist));
-              var b = Math.round(c[2] * edgeDist + 160 * (1 - edgeDist));
-
-              // Random initial fly position
-              var tx = (Math.random() - 0.5) * 2 * flyDist;
-              var ty = (Math.random() - 0.5) * 2 * flyDist;
-              var tr = (Math.random() - 0.5) * 60; // -30 to 30 deg
-              // Random landing rotation
-              var lr = (Math.random() - 0.5) * 6; // -3 to 3 deg
-              // Staggered delay
-              var delay = (0.3 + Math.random() * 2.2).toFixed(2);
-
-              spans.push(
-                '<span class="' + weight + ' flying" ' +
-                'style="transform:translate(' + tx.toFixed(0) + 'px,' + ty.toFixed(0) + 'px) rotate(' + tr.toFixed(1) + 'deg);' +
-                'color:rgb(' + r + ',' + g + ',' + b + ')' +
-                '" data-opacity="' + opacity.toFixed(2) + '" data-delay="' + delay + '" data-lr="' + lr.toFixed(1) + '">' +
-                escaped + '</span>'
-              );
+        for (var y = 0; y < height; y += sampling) {
+          for (var x = 0; x < width; x += sampling) {
+            var i = (y * width + x) * 4;
+            if (imageData.data[i] > 128) {
+              // Map to normalized coordinates
+              var scale = window.innerWidth < 640 ? 3.5 : 6;
+              var scaleY = window.innerWidth < 640 ? 1.5 : 2.5;
+              var nx = (x / width - 0.5) * scale;
+              var ny = -(y / height - 0.5) * scaleY;
+              positions.push(nx, ny, 0);
             }
           }
-          spans.push('\n');
         }
-
-        grid.innerHTML = spans.join('');
-        grid.style.fontSize = fontSize + 'px';
-        grid.style.maxWidth = w + 'px';
-
-        // Step 3: Animate — staggered transition from flying to landed
-        var flyingSpans = grid.querySelectorAll('span.flying');
-        for (var i = 0; i < flyingSpans.length; i++) {
-          (function(span) {
-            var delay = parseFloat(span.getAttribute('data-delay')) * 1000;
-            var finalOpacity = span.getAttribute('data-opacity');
-            var lr = span.getAttribute('data-lr');
-            setTimeout(function() {
-              span.style.transform = 'translate(0,0) rotate(' + lr + 'deg)';
-              span.style.opacity = finalOpacity;
-              span.classList.remove('flying');
-              span.classList.add('landed');
-            }, delay);
-          })(flyingSpans[i]);
-        }
+        return positions;
       }
 
-      document.fonts.ready.then(function() { setTimeout(render, 100); });
+      // Get target positions for "LUNA" - scale based on screen width
+      var isMobile = window.innerWidth < 640;
+      var targetPositions = getTextPositions('LUNA', 512, 128, 100);
+      var particleCount = targetPositions.length / 3;
 
-      var resizeTimer;
-      window.addEventListener('resize', function() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(render, 300);
+      // Cap particle count for performance
+      var maxParticles = isMobile ? 2000 : 5000;
+      if (particleCount > maxParticles) {
+        var step = Math.ceil(particleCount / maxParticles);
+        var filtered = [];
+        for (var i = 0; i < particleCount; i += step) {
+          filtered.push(
+            targetPositions[i * 3],
+            targetPositions[i * 3 + 1],
+            targetPositions[i * 3 + 2]
+          );
+        }
+        targetPositions = filtered;
+        particleCount = filtered.length / 3;
+      }
+
+      // Create geometry
+      var geometry = new THREE.BufferGeometry();
+      var positions = new Float32Array(particleCount * 3);
+      var targets = new Float32Array(targetPositions);
+      var velocities = new Float32Array(particleCount * 3);
+      var randoms = new Float32Array(particleCount);
+      var sizes = new Float32Array(particleCount);
+
+      for (var i = 0; i < particleCount; i++) {
+        // Start scattered
+        positions[i * 3] = (Math.random() - 0.5) * 12;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 8;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 4;
+
+        velocities[i * 3] = 0;
+        velocities[i * 3 + 1] = 0;
+        velocities[i * 3 + 2] = 0;
+
+        randoms[i] = Math.random();
+        sizes[i] = isMobile ? (0.2 + Math.random() * 0.6) : (0.5 + Math.random() * 1.5);
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('aTarget', new THREE.BufferAttribute(targets, 3));
+      geometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1));
+      geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+
+      // Shader material
+      var vertexShader = [
+        'attribute vec3 aTarget;',
+        'attribute float aRandom;',
+        'attribute float aSize;',
+        'uniform float uTime;',
+        'uniform float uProgress;',
+        'uniform vec2 uMouse;',
+        'uniform float uMouseRadius;',
+        'varying float vAlpha;',
+        'varying float vRandom;',
+        '',
+        'void main() {',
+        '  vec3 pos = position;',
+        '  vec3 target = aTarget;',
+        '',
+        '  // Mouse repulsion',
+        '  vec2 diff = pos.xy - uMouse;',
+        '  float dist = length(diff);',
+        '  float mouseForce = smoothstep(uMouseRadius, 0.0, dist);',
+        '  vec2 repulsion = normalize(diff + 0.001) * mouseForce * 1.2;',
+        '',
+        '  // Gentle float animation',
+        '  float floatX = sin(uTime * 0.5 + aRandom * 6.28) * 0.03;',
+        '  float floatY = cos(uTime * 0.4 + aRandom * 6.28) * 0.03;',
+        '',
+        '  target.x += floatX + repulsion.x;',
+        '  target.y += floatY + repulsion.y;',
+        '  target.z += mouseForce * (aRandom - 0.5) * 2.0;',
+        '',
+        '  // Lerp position toward target',
+        '  pos = mix(pos, target, uProgress * (0.02 + aRandom * 0.02));',
+        '',
+        '  vAlpha = 0.3 + 0.7 * uProgress;',
+        '  vAlpha *= 1.0 - mouseForce * 0.5;',
+        '  vRandom = aRandom;',
+        '',
+        '  vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);',
+        '  float sizeMul = ' + (isMobile ? '120.0' : '300.0') + ';',
+        '  gl_PointSize = aSize * (sizeMul / -mvPosition.z) * (0.3 + 0.7 * uProgress);',
+        '  gl_Position = projectionMatrix * mvPosition;',
+        '}',
+      ].join('\n');
+
+      var fragmentShader = [
+        'uniform float uTime;',
+        'varying float vAlpha;',
+        'varying float vRandom;',
+        '',
+        'void main() {',
+        '  // Circular point',
+        '  float d = length(gl_PointCoord - vec2(0.5));',
+        '  if (d > 0.5) discard;',
+        '',
+        '  // Soft edge',
+        '  float alpha = smoothstep(0.5, 0.15, d) * vAlpha;',
+        '',
+        '  // Color: warm teal/mint with subtle variation',
+        '  vec3 color1 = vec3(0.655, 0.545, 0.98);  // #a78bfa lavender',
+        '  vec3 color2 = vec3(0.545, 0.361, 0.965); // #8b5cf6 violet',
+        '  vec3 color3 = vec3(0.769, 0.71, 0.992);  // #c4b5fd light lavender',
+        '  vec3 color = mix(color1, mix(color2, color3, vRandom), vRandom * 0.5);',
+        '',
+        '  // Subtle pulse',
+        '  alpha *= 0.85 + 0.15 * sin(uTime * 2.0 + vRandom * 6.28);',
+        '',
+        '  gl_FragColor = vec4(color, alpha);',
+        '}',
+      ].join('\n');
+
+      var material = new THREE.ShaderMaterial({
+        vertexShader: vertexShader,
+        fragmentShader: fragmentShader,
+        uniforms: {
+          uTime: { value: 0 },
+          uProgress: { value: 0 },
+          uMouse: { value: new THREE.Vector2(999, 999) },
+          uMouseRadius: { value: 1.0 },
+        },
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
       });
+
+      var particles = new THREE.Points(geometry, material);
+      scene.add(particles);
+
+      // Add a subtle ambient particle field in the background
+      var bgCount = 200;
+      var bgGeometry = new THREE.BufferGeometry();
+      var bgPositions = new Float32Array(bgCount * 3);
+      var bgSizes = new Float32Array(bgCount);
+
+      for (var i = 0; i < bgCount; i++) {
+        bgPositions[i * 3] = (Math.random() - 0.5) * 16;
+        bgPositions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+        bgPositions[i * 3 + 2] = (Math.random() - 0.5) * 6 - 2;
+        bgSizes[i] = 0.3 + Math.random() * 0.8;
+      }
+
+      bgGeometry.setAttribute('position', new THREE.BufferAttribute(bgPositions, 3));
+      bgGeometry.setAttribute('aSize', new THREE.BufferAttribute(bgSizes, 1));
+
+      var bgVertexShader = [
+        'attribute float aSize;',
+        'uniform float uTime;',
+        'varying float vAlpha;',
+        '',
+        'void main() {',
+        '  vec3 pos = position;',
+        '  pos.x += sin(uTime * 0.2 + position.y * 0.5) * 0.1;',
+        '  pos.y += cos(uTime * 0.15 + position.x * 0.3) * 0.1;',
+        '',
+        '  vAlpha = 0.15 + 0.1 * sin(uTime + position.x * 2.0);',
+        '',
+        '  vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);',
+        '  gl_PointSize = aSize * (' + (isMobile ? '80.0' : '200.0') + ' / -mvPosition.z);',
+        '  gl_Position = projectionMatrix * mvPosition;',
+        '}',
+      ].join('\n');
+
+      var bgFragmentShader = [
+        'varying float vAlpha;',
+        '',
+        'void main() {',
+        '  float d = length(gl_PointCoord - vec2(0.5));',
+        '  if (d > 0.5) discard;',
+        '  float alpha = smoothstep(0.5, 0.2, d) * vAlpha;',
+        '  gl_FragColor = vec4(0.655, 0.545, 0.98, alpha * 0.3);',
+        '}',
+      ].join('\n');
+
+      var bgMaterial = new THREE.ShaderMaterial({
+        vertexShader: bgVertexShader,
+        fragmentShader: bgFragmentShader,
+        uniforms: {
+          uTime: { value: 0 },
+        },
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      });
+
+      var bgParticles = new THREE.Points(bgGeometry, bgMaterial);
+      scene.add(bgParticles);
+
+      // Animation
+      var startTime = Date.now();
+      var progressTarget = 1;
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        var elapsed = (Date.now() - startTime) / 1000;
+        var time = elapsed;
+
+        // Animate progress (formation)
+        var currentProgress = material.uniforms.uProgress.value;
+        material.uniforms.uProgress.value += (progressTarget - currentProgress) * 0.008;
+        material.uniforms.uTime.value = time;
+        material.uniforms.uMouse.value.set(mouse.worldX, mouse.worldY);
+
+        bgMaterial.uniforms.uTime.value = time;
+
+        // Update positions using the shader (positions converge to targets)
+        var posArray = geometry.attributes.position.array;
+        var tarArray = geometry.attributes.aTarget.array;
+        var rndArray = geometry.attributes.aRandom.array;
+        var prog = material.uniforms.uProgress.value;
+
+        for (var i = 0; i < particleCount; i++) {
+          var ix = i * 3;
+          var iy = i * 3 + 1;
+          var iz = i * 3 + 2;
+
+          var speed = 0.02 + rndArray[i] * 0.02;
+          posArray[ix] += (tarArray[ix] - posArray[ix]) * speed * prog;
+          posArray[iy] += (tarArray[iy] - posArray[iy]) * speed * prog;
+          posArray[iz] += (0 - posArray[iz]) * speed * prog;
+        }
+        geometry.attributes.position.needsUpdate = true;
+
+        // Subtle camera movement
+        camera.position.x += (mouse.x * 0.3 - camera.position.x) * 0.02;
+        camera.position.y += (mouse.y * 0.2 - camera.position.y) * 0.02;
+        camera.lookAt(0, 0, 0);
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      // Handle resize
+      window.addEventListener('resize', function() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+      } // end initParticleSystem
     })();
   </script>
 </body>

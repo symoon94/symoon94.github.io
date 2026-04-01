@@ -234,6 +234,11 @@
       text-align: center;
       padding: 0 2rem;
       pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
     }
 
     .hero-subtitle {
@@ -806,11 +811,23 @@
 
       .hero { min-height: 100svh; }
 
-      .hero-subtitle { font-size: 0.65rem; letter-spacing: 0.15em; }
+      .hero-subtitle {
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+        background: rgba(10,10,10,0.6);
+        padding: 0.3rem 0.8rem;
+        border-radius: 4px;
+      }
 
-      .hero-title-placeholder { height: clamp(120px, 25vh, 200px); }
+      .hero-title-placeholder { height: clamp(100px, 22vh, 160px); }
 
-      .hero-tagline { font-size: 0.7rem; max-width: 90vw; }
+      .hero-tagline {
+        font-size: 0.7rem;
+        max-width: 90vw;
+        background: rgba(10,10,10,0.6);
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+      }
 
       .section-title { font-size: clamp(2rem, 8vw, 3rem); }
 
@@ -832,6 +849,36 @@
       .talks-grid { gap: 1rem; }
 
       .talk-card { padding: 1.25rem; }
+    }
+
+    /* ========================================
+       Typographic Philosophy Section
+       ======================================== */
+    .typo-section {
+      position: relative;
+      width: 100%;
+      padding: 4rem 0 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--bg-primary);
+      overflow: hidden;
+    }
+
+    #typoCanvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .typo-caption {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 1.5rem;
+      text-align: center;
     }
 
     /* ========================================
@@ -917,6 +964,15 @@
     </div>
   </section>
 
+  <!-- Typographic Philosophy Section -->
+  <section class="typo-section" id="philosophy">
+    <canvas id="typoCanvas"></canvas>
+    <p class="typo-caption">
+      <span class="ko">나의 원칙들로 이루어진 LUNA</span>
+      <span class="en">LUNA, composed of my principles</span>
+    </p>
+  </section>
+
   <!-- ASCII Divider -->
   <div class="ascii-divider" aria-hidden="true">
     - - - - - - - - - - - - // 001 - - - - - - - - - - - -
@@ -935,7 +991,7 @@
       <div class="about-text reveal reveal-delay-1">
         <span class="ko">
           <p>
-            <strong>업스테이지</strong>에서 <strong>솔라박스</strong>를 만드는 <strong>문수영 (Luna)</strong>입니다.
+            <strong>업스테이지</strong>에서 <strong>AI Pack</strong>을 만드는 <strong>문수영 (Luna)</strong>입니다.
             AI 모델을 기업 고객이 온프레미스 환경에서 바로 쓸 수 있도록 패키징하는 팀을 리드하고 있습니다.
           </p>
           <p>
@@ -949,7 +1005,7 @@
         <span class="en">
           <p>
             I'm <strong>Luna (Sooyoung Moon)</strong>, a Team Lead at
-            <strong>Upstage AI</strong> where I lead the SolarBox team &mdash;
+            <strong>Upstage AI</strong> where I lead the AI Pack team &mdash;
             packaging AI models for enterprise on-premise deployment.
           </p>
           <p>
@@ -968,11 +1024,11 @@
           </div>
           <div class="about-card-value">
             <span class="ko">
-              팀 리드, SolarBox @ Upstage AI
+              팀 리드, AI Pack @ Upstage AI
               <small>엔터프라이즈 AI 패키징 & 배포 (2021.06 &ndash; 현재)</small>
             </span>
             <span class="en">
-              Team Lead, SolarBox @ Upstage AI
+              Team Lead, AI Pack @ Upstage AI
               <small>Enterprise AI packaging &amp; deployment (Jun 2021 &ndash; Present)</small>
             </span>
           </div>
@@ -1458,8 +1514,10 @@
             var i = (y * width + x) * 4;
             if (imageData.data[i] > 128) {
               // Map to normalized coordinates
-              var nx = (x / width - 0.5) * 6;
-              var ny = -(y / height - 0.5) * 2.5;
+              var scale = window.innerWidth < 640 ? 3.5 : 6;
+              var scaleY = window.innerWidth < 640 ? 1.5 : 2.5;
+              var nx = (x / width - 0.5) * scale;
+              var ny = -(y / height - 0.5) * scaleY;
               positions.push(nx, ny, 0);
             }
           }
@@ -1467,7 +1525,8 @@
         return positions;
       }
 
-      // Get target positions for "LUNA"
+      // Get target positions for "LUNA" - scale based on screen width
+      var isMobile = window.innerWidth < 640;
       var targetPositions = getTextPositions('LUNA', 512, 128, 100);
       var particleCount = targetPositions.length / 3;
 
@@ -1712,6 +1771,144 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
       } // end initParticleSystem
+    })();
+
+    // ========================================
+    // Typographic Philosophy Canvas
+    // ========================================
+    (function() {
+      var canvas = document.getElementById('typoCanvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+
+      var phrases = [
+        'Hack the world!',
+        '규칙적인 삶',
+        'Life is unfair. Use your unfair advantage!',
+        '일단 대충 다 해놓고 돌아가서 다듬기',
+        'More agents, more productivity',
+        '어제보다 나은 나',
+        'Good habits are all you need',
+        'Build unique skills AI can\'t replicate',
+        'You need ENERGY!',
+        'Stop being perfect. You are enough.',
+        '날라다니자!',
+        'Testing the limits!',
+        'One step more',
+        'AI를 세상에서 제일 잘 쓰는 사람',
+        '그럼에도 불구하고',
+        'push the limit',
+        '본질 & 왜',
+        '숲:나무=8:2',
+        '미친 실행력',
+        '약속을 지킨다',
+        '가족 > 업무 > 나',
+        'Once the steps twist, the dance begins!',
+        '레버리지',
+        'NPC 마인드 버리기',
+        '위험한 선택을 한다',
+        '2분 안에 할 수 있는 것은 바로 액션',
+        'COO처럼 일한다',
+        '테크 인플루언서',
+        '패턴을 깨려고 하는 것',
+        '높은 자존감',
+        '철학을 가진다',
+        '럭키비키 마인드',
+        '실수를 지금 해야 나중에 덜 한다',
+        'Find a cheat code for life',
+        '자동사냥을 돌린다',
+        '남들처럼 하면 절대 크게 성공 못한다',
+        '창의적으로 문제를 해결하는 것',
+        'Throw away the NPC mindset',
+        '물음표를 가지는 것',
+        'radical candor',
+      ];
+
+      function render() {
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        var w = Math.min(window.innerWidth, 1200);
+        var h = Math.round(w * 0.32);
+
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.scale(dpr, dpr);
+
+        // 1. Render "LUNA" as mask
+        var maskCanvas = document.createElement('canvas');
+        maskCanvas.width = w;
+        maskCanvas.height = h;
+        var maskCtx = maskCanvas.getContext('2d');
+        maskCtx.fillStyle = '#000';
+        maskCtx.fillRect(0, 0, w, h);
+        maskCtx.fillStyle = '#fff';
+        maskCtx.textAlign = 'center';
+        maskCtx.textBaseline = 'middle';
+        var fontSize = Math.round(w * 0.22);
+        maskCtx.font = '900 ' + fontSize + 'px "Inter", "Helvetica Neue", sans-serif';
+        maskCtx.fillText('LUNA', w / 2, h / 2);
+        var maskData = maskCtx.getImageData(0, 0, w, h).data;
+
+        // 2. Fill with philosophy text
+        ctx.clearRect(0, 0, w, h);
+
+        var lineHeight = w < 600 ? 7 : 9;
+        var baseFontSize = w < 600 ? 5.5 : 7;
+        var phraseIdx = 0;
+        var colors = [
+          'rgba(167,139,250,', // lavender
+          'rgba(196,181,253,', // light lavender
+          'rgba(139,92,246,',  // violet
+          'rgba(245,208,100,', // warm yellow
+          'rgba(253,224,137,', // soft yellow
+        ];
+
+        for (var y = 2; y < h; y += lineHeight) {
+          var x = 0;
+          var attempts = 0;
+          while (x < w && attempts < 500) {
+            var phrase = phrases[phraseIdx % phrases.length];
+            phraseIdx++;
+            attempts++;
+
+            var size = baseFontSize + Math.random() * 2;
+            var weight = Math.random() > 0.6 ? '700' : (Math.random() > 0.5 ? '500' : '300');
+            var italic = Math.random() > 0.85 ? 'italic ' : '';
+            ctx.font = italic + weight + ' ' + size + 'px "JetBrains Mono", monospace';
+
+            var textW = ctx.measureText(phrase + '  ').width;
+
+            // Check if center of text is inside LUNA mask
+            var sampleX = Math.round(x + textW / 2);
+            var sampleY = Math.round(y + lineHeight / 2);
+            if (sampleX >= 0 && sampleX < w && sampleY >= 0 && sampleY < h) {
+              var idx = (sampleY * w + sampleX) * 4;
+              var brightness = maskData[idx];
+
+              if (brightness > 128) {
+                // Inside LUNA - draw with color
+                var opacity = 0.4 + Math.random() * 0.5;
+                var color = colors[Math.floor(Math.random() * colors.length)];
+                ctx.fillStyle = color + opacity + ')';
+                ctx.fillText(phrase, x, y + lineHeight * 0.75);
+              }
+            }
+
+            x += textW;
+          }
+        }
+
+        // 3. Add subtle glow overlay
+        var glow = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w * 0.4);
+        glow.addColorStop(0, 'rgba(167, 139, 250, 0.03)');
+        glow.addColorStop(1, 'rgba(167, 139, 250, 0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      document.fonts.ready.then(render);
+      window.addEventListener('resize', render);
     })();
   </script>
 </body>

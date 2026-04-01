@@ -1512,7 +1512,7 @@
 
         var imageData = ctx.getImageData(0, 0, width, height);
         var positions = [];
-        var sampling = 3; // sample every N pixels
+        var sampling = isMobile ? 2 : 3; // sample every N pixels - tighter on mobile
 
         for (var y = 0; y < height; y += sampling) {
           for (var x = 0; x < width; x += sampling) {
@@ -1536,7 +1536,7 @@
       var particleCount = targetPositions.length / 3;
 
       // Cap particle count for performance
-      var maxParticles = 5000;
+      var maxParticles = isMobile ? 2000 : 5000;
       if (particleCount > maxParticles) {
         var step = Math.ceil(particleCount / maxParticles);
         var filtered = [];
@@ -1570,7 +1570,7 @@
         velocities[i * 3 + 2] = 0;
 
         randoms[i] = Math.random();
-        sizes[i] = 0.5 + Math.random() * 1.5;
+        sizes[i] = isMobile ? (0.2 + Math.random() * 0.6) : (0.5 + Math.random() * 1.5);
       }
 
       geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -1616,7 +1616,8 @@
         '  vRandom = aRandom;',
         '',
         '  vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);',
-        '  gl_PointSize = aSize * (300.0 / -mvPosition.z) * (0.3 + 0.7 * uProgress);',
+        '  float sizeMul = ' + (isMobile ? '120.0' : '300.0') + ';',
+        '  gl_PointSize = aSize * (sizeMul / -mvPosition.z) * (0.3 + 0.7 * uProgress);',
         '  gl_Position = projectionMatrix * mvPosition;',
         '}',
       ].join('\n');
@@ -1693,7 +1694,7 @@
         '  vAlpha = 0.15 + 0.1 * sin(uTime + position.x * 2.0);',
         '',
         '  vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);',
-        '  gl_PointSize = aSize * (200.0 / -mvPosition.z);',
+        '  gl_PointSize = aSize * (' + (isMobile ? '80.0' : '200.0') + ' / -mvPosition.z);',
         '  gl_Position = projectionMatrix * mvPosition;',
         '}',
       ].join('\n');

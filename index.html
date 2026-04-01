@@ -6,6 +6,7 @@
   <title>Luna | Sooyoung Moon - AI Product Engineer</title>
   <meta name="description" content="Luna (Sooyoung Moon) - AI Product Engineer, Team Lead at Upstage AI. Packaging AI for enterprise on-premise deployment.">
   <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta property="og:title" content="Luna | Sooyoung Moon">
   <meta property="og:description" content="AI Product Engineer. Team Lead. The Last Mile.">
   <meta property="og:type" content="website">
@@ -25,11 +26,11 @@
       --text-primary: #e8e8e8;
       --text-secondary: #888888;
       --text-muted: #555555;
-      --accent: #2dd4bf;
-      --accent-dim: rgba(45, 212, 191, 0.15);
-      --accent-glow: rgba(45, 212, 191, 0.4);
-      --accent-hover: #14b8a6;
-      --accent-subtle: #5eead4;
+      --accent: #a78bfa;
+      --accent-dim: rgba(167, 139, 250, 0.15);
+      --accent-glow: rgba(167, 139, 250, 0.4);
+      --accent-hover: #8b5cf6;
+      --accent-subtle: #c4b5fd;
       --border: #222222;
       --border-hover: #333333;
       --font-mono: 'JetBrains Mono', 'Courier New', monospace;
@@ -72,7 +73,7 @@
 
     ::selection {
       background: var(--accent);
-      color: #000;
+      color: #fff;
     }
 
     a {
@@ -97,7 +98,7 @@
       font-size: 0.7rem;
       color: var(--accent);
       background: var(--accent-dim);
-      border: 1px solid rgba(45, 212, 191, 0.3);
+      border: 1px solid rgba(167, 139, 250, 0.3);
       border-radius: 4px;
       padding: 0.35rem 0.7rem;
       cursor: pointer;
@@ -107,7 +108,7 @@
     }
 
     #lang-toggle:hover {
-      background: rgba(45, 212, 191, 0.25);
+      background: rgba(167, 139, 250, 0.25);
       border-color: var(--accent);
     }
 
@@ -522,7 +523,7 @@
       align-items: center;
       gap: 0.4rem;
       background: var(--accent-dim);
-      border: 1px solid rgba(45, 212, 191, 0.2);
+      border: 1px solid rgba(167, 139, 250, 0.2);
       border-radius: 4px;
       padding: 0.3rem 0.6rem;
       font-family: var(--font-mono);
@@ -803,13 +804,23 @@
 
       .section { padding: 5rem 1.25rem; }
 
-      .hero { min-height: 600px; }
+      .hero { min-height: 100svh; }
 
-      .hero-title-placeholder { height: 80px; }
+      .hero-subtitle { font-size: 0.65rem; letter-spacing: 0.15em; }
+
+      .hero-title-placeholder { height: clamp(120px, 25vh, 200px); }
+
+      .hero-tagline { font-size: 0.7rem; max-width: 90vw; }
+
+      .section-title { font-size: clamp(2rem, 8vw, 3rem); }
 
       .timeline { padding-left: 1.5rem; }
 
       .timeline-item { padding-left: 1rem; }
+
+      .timeline-metrics { flex-direction: column; gap: 0.4rem; }
+
+      .about-card-value { font-size: 0.85rem; }
 
       .contact-links {
         flex-direction: column;
@@ -817,6 +828,10 @@
       }
 
       .contact-section { padding: 5rem 1.25rem; }
+
+      .talks-grid { gap: 1rem; }
+
+      .talk-card { padding: 1.25rem; }
     }
 
     /* ========================================
@@ -1121,12 +1136,12 @@
         </div>
         <p class="timeline-desc">
           <span class="ko">
-            10개월간 간헐적으로 발생하던 패닉의 원인을 thread-unsafe go-fitz 라이브러리로 추적하여
+            10개월간 간헐적으로 발생하던 패닉의 원인을 thread-unsafe 서드파티 PDF 라이브러리로 추적하여
             일 10,000건 이상의 segfault를 제거했습니다. 현실을 의심하게 만들지만,
             결국 더 나은 엔지니어로 만들어 주는 그런 종류의 버그였습니다.
           </span>
           <span class="en">
-            Traced a 10-month intermittent panic to a thread-unsafe go-fitz library,
+            Traced a 10-month intermittent panic to a thread-unsafe third-party PDF library,
             eliminating 10,000+ daily segfaults. The kind of bug that makes you
             question reality &mdash; then makes you a better engineer.
           </span>
@@ -1134,7 +1149,7 @@
         <div class="timeline-metrics">
           <span class="metric"><span class="metric-value">10<span class="ko">개월</span><span class="en">-month</span></span> <span class="ko">미스터리 버그</span><span class="en">mystery bug</span></span>
           <span class="metric"><span class="metric-value">10K+</span> <span class="ko">일일 segfault 제거</span><span class="en">daily segfaults eliminated</span></span>
-          <span class="metric"><span class="ko">원인:</span><span class="en">Root cause:</span> <span class="metric-value">thread-unsafe go-fitz</span></span>
+          <span class="metric"><span class="ko">원인:</span><span class="en">Root cause:</span> <span class="metric-value">thread-unsafe PDF lib</span></span>
         </div>
       </div>
 
@@ -1164,32 +1179,6 @@
         </div>
       </div>
 
-      <div class="timeline-item reveal">
-        <div class="timeline-header">
-          <h3 class="timeline-title">
-            <span class="ko">SolarBox 2.5 릴리즈</span>
-            <span class="en">SolarBox 2.5 Release</span>
-          </h3>
-          <span class="timeline-period">2025 &ndash; 2026</span>
-        </div>
-        <p class="timeline-desc">
-          <span class="ko">
-            4개 이상의 팀을 조율하여 6개 AI 제품을 3개 클라우드 마켓플레이스에
-            동시 출시하는 메이저 릴리즈를 진행했습니다.
-            대규모 크로스펑셔널 오케스트레이션의 경험이었습니다.
-          </span>
-          <span class="en">
-            Coordinated a major release across 4+ teams, shipping 6 AI products
-            to 3 cloud marketplaces simultaneously. Cross-functional orchestration
-            at scale.
-          </span>
-        </p>
-        <div class="timeline-metrics">
-          <span class="metric"><span class="metric-value">4+</span> <span class="ko">팀 조율</span><span class="en">teams coordinated</span></span>
-          <span class="metric"><span class="metric-value">6</span> AI <span class="ko">제품</span><span class="en">products</span></span>
-          <span class="metric"><span class="metric-value">3</span> cloud marketplaces</span>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -1611,9 +1600,9 @@
         '  float alpha = smoothstep(0.5, 0.15, d) * vAlpha;',
         '',
         '  // Color: warm teal/mint with subtle variation',
-        '  vec3 color1 = vec3(0.176, 0.831, 0.749); // #2dd4bf teal-400',
-        '  vec3 color2 = vec3(0.078, 0.722, 0.651); // #14b8a6 teal-500',
-        '  vec3 color3 = vec3(0.369, 0.918, 0.831); // #5eead4 teal-300',
+        '  vec3 color1 = vec3(0.655, 0.545, 0.98);  // #a78bfa lavender',
+        '  vec3 color2 = vec3(0.545, 0.361, 0.965); // #8b5cf6 violet',
+        '  vec3 color3 = vec3(0.769, 0.71, 0.992);  // #c4b5fd light lavender',
         '  vec3 color = mix(color1, mix(color2, color3, vRandom), vRandom * 0.5);',
         '',
         '  // Subtle pulse',
@@ -1681,7 +1670,7 @@
         '  float d = length(gl_PointCoord - vec2(0.5));',
         '  if (d > 0.5) discard;',
         '  float alpha = smoothstep(0.5, 0.2, d) * vAlpha;',
-        '  gl_FragColor = vec4(0.176, 0.831, 0.749, alpha * 0.3);',
+        '  gl_FragColor = vec4(0.655, 0.545, 0.98, alpha * 0.3);',
         '}',
       ].join('\n');
 

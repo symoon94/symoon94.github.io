@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hot Coffee — Mayzin & Rexx Life Raj | Luna's Playlist</title>
+  <meta name="description" content="Lyrics: Hot Coffee by Mayzin & Rexx Life Raj">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #111111;
+      --bg-card: #161616;
+      --text-primary: #e8e8e8;
+      --text-secondary: #888888;
+      --text-muted: #555555;
+      --accent: #a78bfa;
+      --accent-dim: rgba(167, 139, 250, 0.15);
+      --accent-hover: #8b5cf6;
+      --border: #222222;
+      --border-hover: #333333;
+      --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    ::selection { background: var(--accent); color: #fff; }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      padding: 0.5rem 0;
+      margin-bottom: 3rem;
+      transition: color 0.3s ease;
+    }
+
+    .back-link:hover { color: var(--accent); }
+    .back-link .arrow { transition: transform 0.3s; }
+    .back-link:hover .arrow { transform: translateX(-3px); }
+
+    .header {
+      padding-bottom: 2.5rem;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .label::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--font-mono);
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .artist {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+    }
+
+    .meta span {
+      padding: 0.3rem 0.7rem;
+      background: var(--accent-dim);
+      border: 1px solid rgba(167, 139, 250, 0.2);
+      border-radius: 4px;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    .meta a {
+      padding: 0.3rem 0.7rem;
+      background: var(--accent-dim);
+      border: 1px solid rgba(167, 139, 250, 0.2);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+    }
+
+    .meta a:hover {
+      background: rgba(167, 139, 250, 0.25);
+      border-color: var(--accent);
+    }
+
+    .lyrics-block {
+      margin-bottom: 2rem;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.75rem;
+      padding-left: 1rem;
+      border-left: 2px solid var(--accent);
+    }
+
+    .lyrics-block.hook .section-tag {
+      color: var(--accent);
+    }
+
+    .lyrics {
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      line-height: 2;
+      color: var(--text-primary);
+      white-space: pre-line;
+      padding-left: 1rem;
+    }
+
+    .lyrics.hook-text {
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .footer-note {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .footer-note a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 1.5rem 1rem 3rem; }
+      h1 { font-size: 2rem; }
+      .lyrics { font-size: 0.95rem; line-height: 1.9; padding-left: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="../index.html#into" class="back-link">
+      <span class="arrow">&larr;</span> back to luna.dev
+    </a>
+
+    <header class="header">
+      <div class="label">Now Playing</div>
+      <h1>Hot Coffee</h1>
+      <div class="artist">Mayzin &times; Rexx Life Raj</div>
+      <div class="meta">
+        <span>2024.04.05</span>
+        <span>Hip-Hop</span>
+        <span>2:41</span>
+        <a href="https://www.youtube.com/watch?v=enqxGkw8HoQ" target="_blank" rel="noopener noreferrer">Watch &rarr;</a>
+      </div>
+    </header>
+
+    <div class="lyrics-block hook">
+      <div class="section-tag">Hook</div>
+      <p class="lyrics hook-text">I need to wake it up, wake it up, she on it, ayy
+I really can't get enough, get enough of your body, ayy
+I really can't make it up, make it up, I got my hands full
+I really can't get enough, get enough of your body, ayy
+
+I need to wake it up, wake it up, she on it, ayy
+I really can't get enough, get enough of your body, ayy
+I really can't make it up, make it up, I got my hands full
+I really can't get enough, get enough of, of, of</p>
+    </div>
+
+    <div class="lyrics-block">
+      <div class="section-tag">Verse 1</div>
+      <p class="lyrics">I guess it's the part where I start the rap
+All my words make her arch her back
+Said you fallin' in love, be more smart than that
+I got girls in these countries across the map
+I might slide for a week, then I'll be right back
+I got multiple missions to keep on track
+
+She gettin' mad on a B-day
+Yeah, to the left, to the left
+She want my lovin' on replay
+She tell me it's the best, it's the best
+Excited whenever she see me, yeah, yeah
+Say less, say less, my heart is all on my chest
+She had hot coffee, what I need next?
+I'm goin' hot coffee, ayy</p>
+    </div>
+
+    <div class="lyrics-block hook">
+      <div class="section-tag">Hook</div>
+      <p class="lyrics hook-text">I need to wake it up, wake it up, she on it, ayy
+I really can't get enough, get enough of your body, ayy
+I really can't make it up, make it up, I got my hands full
+I really can't get enough, get enough, of, of, of
+
+Hot coffee, ayy
+I need to wake it up, wake it up, she on it, ayy
+I really can't get enough, get enough, of, of your body, ayy
+I really can't make it up, make it up, I got my hands full
+I really can't get enough, get enough, of, of</p>
+    </div>
+
+    <div class="lyrics-block">
+      <div class="section-tag">Verse 2</div>
+      <p class="lyrics">But you can't get enough of this lifestyle, how we hoppin' out for us
+Big pack n**** jumpin' out black sleeves really important
+Let me give you this feelin' that you ain't felt before
+Jumpin' out old school Porsches
+Me and my bitch look gorgeous
+She in her Bottegas, no forces
+
+Ooh, twenty floors up with the view
+Sprayin' the bottle and the cup gettin' loose
+I ain't just rappin', baby, I got the proof
+Silence in the steam room, all on the roof, yeah
+I know you wanna hang around 'cause I'm so, so, so
+But you can't hold me for too long, I'm
+Hot coffee, ayy</p>
+    </div>
+
+    <div class="lyrics-block hook">
+      <div class="section-tag">Hook (Outro)</div>
+      <p class="lyrics hook-text">I need to wake it up, wake it up, she on it, ayy
+I really can't get enough, get enough, of, of your body, ayy
+I really can't make it up, make it up, I got my hands full
+I really can't get enough, get enough, of, of
+
+Hot coffee, ayy
+I need to wake it up, wake it up, she on it, ayy
+I really can't get enough, get enough, of, of your body, ayy
+I really can't make it up, make it up, I got my hands full
+I really can't get enough, get enough, of</p>
+    </div>
+
+    <div class="footer-note">
+      <p>Lyrics transcribed by ear &middot; <a href="https://www.youtube.com/watch?v=enqxGkw8HoQ" target="_blank" rel="noopener noreferrer">Listen on YouTube</a></p>
+      <p style="margin-top: 0.5rem;">From the EP <em>Things Left Unsaid</em></p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Code Review Bottleneck — Notes from Luna</title>
+  <meta name="description" content="How the best engineers are solving the code review bottleneck: guardrails, harnesses over models, and engineering the environment your agents run in.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #111111;
+      --bg-card: #161616;
+      --text-primary: #e8e8e8;
+      --text-secondary: #888888;
+      --text-muted: #555555;
+      --accent: #a78bfa;
+      --accent-dim: rgba(167, 139, 250, 0.15);
+      --accent-hover: #8b5cf6;
+      --border: #222222;
+      --border-hover: #333333;
+      --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    ::selection { background: var(--accent); color: #fff; }
+
+    .container { max-width: 720px; margin: 0 auto; }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      padding: 0.5rem 0;
+      margin-bottom: 3rem;
+      transition: color 0.3s ease;
+    }
+    .back-link:hover { color: var(--accent); }
+    .back-link .arrow { transition: transform 0.3s; }
+    .back-link:hover .arrow { transform: translateX(-3px); }
+
+    .header {
+      padding-bottom: 2.5rem;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .label::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--font-mono);
+      font-size: clamp(1.9rem, 5vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+    }
+    .meta span {
+      padding: 0.3rem 0.7rem;
+      background: var(--accent-dim);
+      border: 1px solid rgba(167, 139, 250, 0.2);
+      border-radius: 4px;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+    .meta a {
+      padding: 0.3rem 0.7rem;
+      background: var(--accent-dim);
+      border: 1px solid rgba(167, 139, 250, 0.2);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+    }
+    .meta a:hover { background: rgba(167, 139, 250, 0.25); border-color: var(--accent); }
+
+    .lede {
+      font-size: 1.15rem;
+      line-height: 1.8;
+      color: var(--text-primary);
+      margin-bottom: 2.5rem;
+    }
+
+    article h2 {
+      font-family: var(--font-mono);
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 3rem 0 1rem;
+      letter-spacing: -0.01em;
+    }
+    article h2 .num {
+      color: var(--accent);
+      font-size: 0.85rem;
+      margin-right: 0.6rem;
+    }
+
+    article h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 2rem 0 0.6rem;
+    }
+
+    article p {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--text-secondary);
+      margin-bottom: 1.2rem;
+    }
+    article p strong { color: var(--text-primary); font-weight: 600; }
+    article a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    article a:hover { border-bottom-color: var(--accent); }
+
+    article ul {
+      list-style: none;
+      margin: 0 0 1.4rem;
+      padding: 0;
+    }
+    article ul li {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-bottom: 0.7rem;
+      color: var(--text-secondary);
+      line-height: 1.75;
+    }
+    article ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    article ul li strong { color: var(--text-primary); }
+
+    blockquote {
+      margin: 1.8rem 0;
+      padding: 1rem 1.4rem;
+      border-left: 2px solid var(--accent);
+      background: var(--accent-dim);
+      border-radius: 0 6px 6px 0;
+      font-style: italic;
+      color: var(--text-primary);
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.1rem 0.4rem;
+      color: var(--accent);
+    }
+
+    .footer-note {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.8;
+    }
+    .footer-note a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      body { padding: 1.5rem 1rem 3rem; }
+      h1 { font-size: 1.9rem; }
+      .lede { font-size: 1.05rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="../index.html#talks" class="back-link">
+      <span class="arrow">&larr;</span> back to luna.dev
+    </a>
+
+    <header class="header">
+      <div class="label">Notes</div>
+      <h1>The Code Review Bottleneck</h1>
+      <div class="meta">
+        <span>2026.06.25</span>
+        <span>AI Engineering</span>
+        <span>8 min read</span>
+        <a href="https://www.youtube.com/watch?v=W1uG25of2t0" target="_blank" rel="noopener noreferrer">Source talk &rarr;</a>
+      </div>
+    </header>
+
+    <article>
+      <p class="lede">
+        AI now writes code 10&times; to 100&times; faster than we can review it. The
+        bottleneck didn't disappear &mdash; it moved. These are my notes from a conversation
+        with Florian Buetow (AI engineer at Xebia) on how the best teams are solving it:
+        not by reviewing harder, but by engineering the environment their agents run in.
+      </p>
+
+      <h2><span class="num">01</span>Review is the new bottleneck</h2>
+      <p>
+        The old software lifecycle worked because code wasn't delivered faster than a human
+        could review it. That assumption is gone. Even the big players admit it openly.
+      </p>
+      <ul>
+        <li><strong>Google</strong> reported in 2025 that 50% of its code is AI-generated and is pushing toward 75% &mdash; while acknowledging review is a bottleneck they "don't know how to solve yet."</li>
+        <li><strong>Amazon</strong> saw outages and revenue loss from AI-generated code, then introduced policies requiring senior-engineer review for critical systems before anything merges or deploys.</li>
+      </ul>
+      <p>
+        Generate 10&times; more code and you put 10&times; more pressure on the humans
+        downstream. The question becomes: how do you scale reviewing without burning out
+        your senior engineers?
+      </p>
+
+      <h2><span class="num">02</span>Horizontal vs. vertical scaling</h2>
+      <p>
+        There are two ways to scale AI engineering. The <strong>horizontal</strong> path is
+        automating the human pipeline you already have &mdash; auto-review every PR with
+        Copilot, for example. Most companies do this, but rarely show that it actually
+        improves quality.
+      </p>
+      <p>
+        The <strong>vertical</strong> path is where small, specialized teams build their own
+        tooling and custom environments so the product ships the way they intend. They don't
+        inherit a blueprint &mdash; they refine one. That's where the real leverage is.
+      </p>
+
+      <h2><span class="num">03</span>Guardrails: engineering the environment</h2>
+      <p>
+        The provocative idea is <strong>"don't do code reviews at all."</strong> The way you
+        get there is by feeding the agent automated feedback as close as possible to where it
+        generates the code &mdash; on the developer's laptop, not after a PR lands on GitHub.
+        Florian calls these <em>guardrails</em>:
+      </p>
+      <ul>
+        <li><strong>Static checks</strong> &mdash; formatters, linters, security scanners (SonarQube, etc.). Old tools, but now the agent consumes the feedback, not the human.</li>
+        <li><strong>Semantic grep</strong> &mdash; catch specific code patterns and reject them with a natural-language message. Example: "no default values in method parameters," "never swallow errors." The rule encodes the prompt you'd otherwise type by hand.</li>
+        <li><strong>Architectural unit tests</strong> &mdash; fast checks on module dependencies. Enforce that the UI never touches the database directly, always through the business-logic layer.</li>
+        <li><strong>Stop hooks + Ralph loops / <code>goal</code></strong> &mdash; when the agent finishes, a stop hook fires a shell script (your tests and guardrails). On failure it returns natural-language feedback and the agent keeps working until it's fixed &mdash; long stretches with no human in the loop.</li>
+      </ul>
+      <blockquote>
+        Every time I interrogate the AI about code instead of reviewing it myself and an issue
+        comes up, I add another guardrail rule. Over time you're shaping the environment to be
+        tighter and tighter, aligned with how you think code should look.
+      </blockquote>
+      <p>
+        Code quality still matters &mdash; not just for human taste, but because <strong>code is
+        context for the AI</strong>. Vibe-code something sloppy and the model will eventually
+        confuse itself on its own output. Keep modules isolated behind clean interfaces and the
+        agent does dramatically better.
+      </p>
+
+      <h2><span class="num">04</span>The harness matters more than the model</h2>
+      <p>
+        <strong>"In my experience, the harness matters more than the model."</strong> The harness
+        provides the tools, the prompting, the memory layer, and the ability to execute tool
+        calls. In one experiment, the same frontier model succeeded or failed at the same task
+        depending purely on the harness.
+      </p>
+      <p>
+        Which one wins keeps changing &mdash; it was Claude Code, then Codex shifted ahead for
+        implementation work. That's exactly why locking your policy to a single tool ("we only
+        use X") is dangerous: the next release can flip everything. Models have different
+        "personalities" too &mdash; some excel at instruction-following, others at filling gaps
+        when you under-specify.
+      </p>
+
+      <h2><span class="num">05</span>Spec-driven vs. TDD</h2>
+      <p>
+        Pure spec-driven development <strong>failed</strong> for Florian: the perfect prompt
+        still produced something he didn't intend. What worked was combining a spec with
+        <strong>behavioral tests generated up front</strong> &mdash; the tests become the feedback
+        that pulls the agent back on track when it drifts. That was the first time he saw this
+        actually work well.
+      </p>
+      <blockquote>
+        A spec isn't code. It's a document of shared understanding. Treat a fine-grained
+        behavioral specification as the thing that matters &mdash; and let tests, not prose,
+        enforce it.
+      </blockquote>
+
+      <h2><span class="num">06</span>What stays human</h2>
+      <p>
+        Implementation is increasingly automated. The skill that remains is
+        <strong>understanding your system</strong> &mdash; the architecture, how components talk
+        to each other. Lose that and you hit "cognitive debt": you can no longer reason about
+        your own codebase. Worse is "cognitive surrender" &mdash; letting the agent take the
+        wheel and own the blame.
+      </p>
+      <p>
+        The work moves up front. You define exactly what you're building and sketch the
+        architecture before implementation &mdash; then encode it as rules. It feels more
+        intense, but it was always the real work; you're just doing it earlier. And done with
+        AI in the loop, that discovery phase is genuinely fast and rewarding.
+      </p>
+
+      <h2><span class="num">07</span>Where to start</h2>
+      <p>If you want to apply this to a live codebase tomorrow:</p>
+      <ul>
+        <li><strong>Start with guardrails</strong> &mdash; a formatter, a linter, a few semantic-grep rules encoding the feedback you keep giving in PRs.</li>
+        <li><strong>Ask the AI</strong> what anti-patterns exist in your codebase, then write a check that flags them.</li>
+        <li><strong>Mine your session logs</strong> (e.g. <code>~/.claude</code>) &mdash; ask the model where you repeatedly had to correct it, and turn those into static checks. It's a 15-minute skill to build.</li>
+        <li><strong>Measure with vs. without.</strong> Once you see guardrails let you do more while staying out of the loop, you won't go back.</li>
+        <li><strong>Always write the test.</strong> A small generated test is far less likely to be wrong than a generated microservice. Fix a bug, leave a test.</li>
+      </ul>
+
+      <blockquote>
+        What companies are doing is handing people a hand grenade &mdash; AI &mdash; and saying
+        "don't blow it up, but use it." That risk gets standardized into policy. Just like
+        Amazon, soon the rule will be: yes, YOLO it &mdash; but not the billing system.
+      </blockquote>
+    </article>
+
+    <div class="footer-note">
+      <p>Notes from a conversation with Florian Buetow &middot; <a href="https://www.youtube.com/watch?v=W1uG25of2t0" target="_blank" rel="noopener noreferrer">Watch the full episode</a></p>
+      <p style="margin-top: 0.5rem;">Summarized &amp; written on luna.dev</p>
+    </div>
+  </div>
+</body>
+</html>
